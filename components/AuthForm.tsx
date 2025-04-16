@@ -66,7 +66,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
       <div className="card flex flex-col gap-6 py-14 px-10">
         {/* Logo and Heading */}
         <div className="flex justify-center items-center gap-2">
-          <Image src="/AVILogo.png" width={38} height={38} alt="logo" />
+          <Image src="/DarkAVILogo.png" width={38} height={38} alt="logo" />
           <h2 className="text-primary-100">AI Voice Interview</h2>
         </div>
 
