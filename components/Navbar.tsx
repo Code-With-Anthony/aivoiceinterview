@@ -138,7 +138,10 @@ const Navbar = () => {
             <div className="mt-4 border-t pt-4">
               <div className="flex items-center gap-2 mb-2">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage
+                    src="https://github.com/shadcn.png"
+                    alt={user.name}
+                  />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div>

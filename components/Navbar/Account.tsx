@@ -6,13 +6,25 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sparkles, BadgeCheck, CreditCard, Bell, LogOut } from "lucide-react";
 
-export function Account({ user, handleNavigate }) {
+interface User {
+  name: string;
+  email: string;
+}
+
+type HandleNavigate = (route: string) => () => void;
+
+interface AccountProps {
+  user: User;
+  handleNavigate: HandleNavigate;
+}
+
+export function Account({ user, handleNavigate }: AccountProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
         <div className="cursor-pointer w-10 h-10 flex items-center justify-center rounded-lg hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors">
           <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarImage src="https://github.com/shadcn.png" alt={user.name} />
             <AvatarFallback className="rounded-lg">CN</AvatarFallback>
           </Avatar>
         </div>
@@ -26,7 +38,7 @@ export function Account({ user, handleNavigate }) {
         {/* User Info */}
         <div className="flex items-center gap-2 px-4 py-3 text-left text-sm">
           <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage src={user.avatar} alt={user.name} />
+            <AvatarImage src="https://github.com/shadcn.png" alt={user.name} />
             <AvatarFallback className="rounded-lg">CN</AvatarFallback>
           </Avatar>
           <div className="grid text-sm leading-tight">
