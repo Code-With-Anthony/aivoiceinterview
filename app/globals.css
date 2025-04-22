@@ -23,19 +23,18 @@
   --color-dark-300: #242633;
 
   --font-mona-sans: "Mona Sans", sans-serif;
-
-  --bg-pattern: url("/pattern.png");
 }
 
 :root {
   --radius: 0.625rem;
+  --primary: hsl(256, 91%, 58%);
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
+  /* --primary: oklch(0.205 0 0); */
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -64,12 +63,13 @@
 
 .dark {
   --background: oklch(0.145 0 0);
+  --primary: #fffff;
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
+  /* --primary: oklch(0.922 0 0); */
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
@@ -193,6 +193,10 @@
     @apply dark-gradient rounded-2xl min-h-full;
   }
 
+    .container-padding {
+      @apply px-4 sm:px-6 lg:px-8;
+    }
+
   .form {
     @apply w-full;
 
@@ -265,6 +269,23 @@
     @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
   }
 
+    .section-padding {
+      @apply py-16 md:py-24;
+    }
+
+    .gradient-text {
+      @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
+    }
+
+        a {
+          @apply transition-all duration-500 ease-in-out;
+          /* Smooth transition */
+        }
+
+        a:hover {
+          @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
+        }
+
   .card-cta {
     @apply flex !flex-row blue-gradient-dark rounded-3xl px-16 py-6 items-center justify-between max-sm:px-4;
   }
@@ -272,6 +293,10 @@
   .interviews-section {
     @apply flex flex-wrap gap-4 max-lg:flex-col w-full items-stretch;
   }
+
+    .menu-item {
+      @apply flex w-full items-center px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors;
+    }
 
   .interview-text {
     @apply text-lg text-center text-white;

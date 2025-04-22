@@ -36,7 +36,7 @@ const InterviewCard = async ({
             height={90}
             className="rounded-full object-fit size-[90px]"
           />
-          <h3 className="mt-5 capitalize">{role} Interview</h3>
+          <h3 className="mt-5 capitalize text-white">{role}</h3>
           <div className="flex flex-row gap-5 mt-3">
             <div className="flex flex-row gap-2">
               <Image
