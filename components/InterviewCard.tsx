@@ -1,13 +1,12 @@
-import React from "react";
+import { getRandomInterviewCover } from "@/lib/utils";
 import dayjs from "dayjs";
 import Image from "next/image";
-import { Button } from "./ui/button";
 import Link from "next/link";
-import { getRandomInterviewCover } from "@/lib/utils";
 import DisplayTechIcons from "./DisplayTechIcons";
+import { Button } from "./ui/button";
 
 const InterviewCard = ({
-  interviewId,
+  id,
   userId,
   role,
   type,
@@ -58,13 +57,9 @@ const InterviewCard = ({
           <DisplayTechIcons techStack={techstack} />
           <Button className="btn-primary">
             <Link
-              href={
-                feedback
-                  ? `/interview/${interviewId}/feedback`
-                  : `/interview/${interviewId}`
-              }
+              href={feedback ? `/interview/${id}/feedback` : `/interview/${id}`}
             >
-              {feedback ? "View Feedback" : "Take Interview"}
+              {feedback ? "View Feedback" : "View Interview"}
             </Link>
           </Button>
         </div>
