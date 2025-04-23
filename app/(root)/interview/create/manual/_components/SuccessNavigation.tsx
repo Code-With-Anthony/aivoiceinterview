@@ -14,13 +14,15 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-
+import { toast } from "sonner";
 const SuccessNavigation = ({ interviewId, formData }) => {
-  console.log("interviewId, ", interviewId);
-  console.log("formData: ", formData);
+  const url = process.env.NEXT_PUBLIC_HOST_URL + "/" + interviewId;
   const GetInterviewUrl = () => {
-    const url = process.env.NEXT_PUBLIC_HOST_URL + "/" + interviewId;
     return url;
+  };
+  const onCopyLink = async () => {
+    await navigator.clipboard.writeText(url);
+    toast.info("Linked Copied");
   };
   return (
     <div className="flex flex-col items-center justify-center mt-10">
@@ -42,7 +44,7 @@ const SuccessNavigation = ({ interviewId, formData }) => {
         </div>
         <div className="mt-3 flex gap-3 items-center">
           <Input defaultValue={GetInterviewUrl()} disabled />
-          <Button>
+          <Button onClick={() => onCopyLink()}>
             <Copy /> Copy Link
           </Button>
         </div>

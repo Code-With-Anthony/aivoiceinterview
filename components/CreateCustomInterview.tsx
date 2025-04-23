@@ -113,18 +113,18 @@ export default function CreateCustomInterview({ goToNextStep }) {
         </div>
 
         <Progress value={step * 33.33} />
-        {step === 1 && !goToNextStep && (
+        {step === 1 && (
           <GenerationOptions
             onSelectGenerationOption={onSelectGenerationOption}
           />
         )}
-        {step === 2 || goToNextStep ? (
+        {step === 2 && (
           <FormContainer
             onHandleInputChange={onHandleInputChange}
             GoToNextStep={() => onGoTONextStep()}
             GoToPreviousStep={() => setStep(step - 1)}
           />
-        ) : null}
+        )}
         {step === 3 && (
           <SuccessNavigation interviewId={123456} formData={formData} />
         )}
