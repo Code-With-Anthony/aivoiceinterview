@@ -1,10 +1,12 @@
+import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
 import { getRandomInterviewCover } from "@/lib/utils";
 import dayjs from "dayjs";
 import Image from "next/image";
 import Link from "next/link";
 import DisplayTechIcons from "./DisplayTechIcons";
 import { Button } from "./ui/button";
-import { getFeedbackByInterviewId } from "@/lib/actions/general.action";
+import { Card } from "./ui/card";
+import { CalendarDays } from "lucide-react";
 
 const InterviewCard = async ({
   id,
@@ -24,9 +26,9 @@ const InterviewCard = async ({
   ).format("MMM D, YYYY");
   return (
     <div className="card-border w-[360px] max-sm:w-full min-h-96">
-      <div className="card-interview">
+      <Card className="card-interview">
         <div>
-          <div className="absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg bg-light-600">
+          <div className="absolute top-0 right-0 w-fit px-4 py-2 rounded-bl-lg bg-black dark:bg-white">
             <p className="badge-text">{normalizedType}</p>
           </div>
           <Image
@@ -36,15 +38,10 @@ const InterviewCard = async ({
             height={90}
             className="rounded-full object-fit size-[90px]"
           />
-          <h3 className="mt-5 capitalize text-white">{role}</h3>
+          <h3 className="mt-5 capitalize">{role}</h3>
           <div className="flex flex-row gap-5 mt-3">
             <div className="flex flex-row gap-2">
-              <Image
-                src="/calendar.svg"
-                alt="calendar"
-                width={22}
-                height={22}
-              />
+              <CalendarDays />
               <p>{formatteddate}</p>
             </div>
             <div className="flex flex-row gap-2 items-center">
@@ -67,7 +64,7 @@ const InterviewCard = async ({
             </Link>
           </Button>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

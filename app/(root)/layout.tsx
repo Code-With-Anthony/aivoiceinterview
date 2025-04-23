@@ -9,14 +9,8 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   if (!isUserAuthenticated) redirect("/sign-in");
   return (
     <div className="root-layout">
-      {/* <nav>
-        <Link href="/" className="flex items-center gap-2">
-          <Image src="/DarkAVILogo.png" alt="logo" width={38} height={32} />
-          <h2 className="text-primary-100">AVI</h2>
-        </Link>
-      </nav> */}
       <Navbar />
-      {children}
+      <div className="pt-16 md:pt-20 lg:pt-24">{children}</div>
     </div>
   );
 };

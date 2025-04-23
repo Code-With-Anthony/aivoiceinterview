@@ -19,14 +19,21 @@ const Feedback = async ({ params }: RouteParams) => {
 
   const feedback = await getFeedbackByInterviewId({
     interviewId: id,
-    userId: user?.id!,
+    userId: user?.id || "",
   });
+
+  const getScoreColor = (score: number) => {
+    if (score < 30) return "text-red-500";
+    if (score >= 50 && score < 75) return "text-yellow-500";
+    if (score >= 75) return "text-green-600";
+    return "text-gray-500"; // fallback
+  };
 
   return (
     <section className="section-feedback">
       <div className="flex flex-row justify-center">
         <h1 className="text-4xl font-semibold">
-          Feedback on the Interview -{" "}
+          <span className="gradient-text">Feedback </span>on the Interview -{" "}
           <span className="capitalize">{interview.role}</span> Interview
         </h1>
       </div>
@@ -38,7 +45,11 @@ const Feedback = async ({ params }: RouteParams) => {
             <Image src="/star.svg" width={22} height={22} alt="star" />
             <p>
               Overall Impression:{" "}
-              <span className="text-primary-200 font-bold">
+              <span
+                className={`font-bold ${getScoreColor(
+                  feedback?.totalScore || 0
+                )}`}
+              >
                 {feedback?.totalScore}
               </span>
               /100
@@ -95,7 +106,7 @@ const Feedback = async ({ params }: RouteParams) => {
       <div className="buttons">
         <Button className="btn-secondary flex-1">
           <Link href="/" className="flex w-full justify-center">
-            <p className="text-sm font-semibold text-primary-200 text-center">
+            <p className="text-sm font-semibold text-white text-center">
               Back to dashboard
             </p>
           </Link>

@@ -31,9 +31,9 @@ const Page = async () => {
           <FAQSection />
         </>
       )}
-      <section className="flex flex-col gap-6 mt-8">
-        {/* <h2>Your Interviews</h2> */}
-        <BreadCrumb items={[{ name: "Home", href: "/" }]} />
+      <section className="flex flex-col gap-6">
+        <h2>Your Interviews</h2>
+        {/* <BreadCrumb items={[{ name: "Home", href: "/" }]} /> */}
         <div className="interviews-section">
           {hasPastInterviews ? (
             userInterviews?.map((interview) => (

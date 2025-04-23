@@ -28,8 +28,10 @@
 :root {
   --radius: 0.625rem;
   --primary: hsl(256, 91%, 58%);
-  --background: oklch(1 0 0);
+  --text-root: #000000;
+  --background: #f4f6fa;
   --foreground: oklch(0.145 0 0);
+  --navbar-background: oklch(0.145 0 0 / 0.5);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -63,8 +65,10 @@
 
 .dark {
   --background: oklch(0.145 0 0);
-  --primary: #fffff;
+  --primary: #fefeff;
+  --text-root: #ffffff;
   --foreground: oklch(0.985 0 0);
+  --navbar-background: oklch(27.8% 0.033 256.848)
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -142,7 +146,7 @@
     @apply bg-background text-foreground;
   }
   p {
-    @apply text-light-100;
+    @apply dark:text-primary text-black;
   }
   h2 {
     @apply text-3xl font-semibold;
@@ -154,7 +158,7 @@
     @apply list-disc list-inside;
   }
   li {
-    @apply text-light-100;
+    @apply dark:text-primary text-black;
   }
 }
 
@@ -185,8 +189,12 @@
     @apply bg-dark-200 rounded-full min-h-12 px-5 cursor-pointer border border-input  overflow-hidden;
   }
 
+  .navbar-primary {
+    @apply fixed top-0 left-0 right-0 z-50 transition-all duration-300
+  }
+
   .card-border {
-    @apply border-gradient p-0.5 rounded-2xl w-fit;
+    @apply dark:border-gradient p-0.5 rounded-2xl w-fit;
   }
 
   .card {
@@ -311,10 +319,10 @@
   }
 
   .card-interview {
-    @apply dark-gradient rounded-2xl min-h-full flex flex-col p-6 relative overflow-hidden gap-10 justify-between;
+    @apply dark:dark-gradient bg-white rounded-2xl min-h-full flex flex-col p-6 relative overflow-hidden gap-10 justify-between;
 
     .badge-text {
-      @apply text-sm font-semibold capitalize;
+      @apply text-sm font-semibold capitalize text-white dark:text-black;
     }
   }
 }

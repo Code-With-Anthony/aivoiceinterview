@@ -7,6 +7,7 @@ import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 
 enum CallStatus {
   INACTIVE = "INACTIVE",
@@ -152,20 +153,17 @@ const Agent = ({
         </div>
         <div className="card-border">
           <div className="card-content">
-            <Image
-              src="/user-avatar.png"
-              alt="User"
-              width={40}
-              height={540}
-              className="rounded-full object-cover size-[120px]"
-            />
+            <Avatar className="rounded-full object-cover size-[120px]">
+              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
+              <AvatarFallback>CN</AvatarFallback>
+            </Avatar>
             {userName}
           </div>
         </div>
       </div>
 
       {messages?.length > 0 && (
-        <div className="transcript-border">
+        <div className="transcript-border mt-4 mb-4">
           <div className="transcript">
             <p
               key={latestMessage}
