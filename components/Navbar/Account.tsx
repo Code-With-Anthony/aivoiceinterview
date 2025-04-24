@@ -1,12 +1,12 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Sparkles, BadgeCheck, CreditCard, Bell, LogOut } from "lucide-react";
-import Link from "next/link";
 import { signOut } from "@/lib/actions/auth.action";
+import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface User {

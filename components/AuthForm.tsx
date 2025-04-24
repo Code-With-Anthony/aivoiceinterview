@@ -1,5 +1,6 @@
 "use client";
 
+import { GoogleSignInButton } from "@/app/(auth)/_components/GoogleSignInButton";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { auth } from "@/firebase/client";
@@ -15,11 +16,10 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import FormField from "./FormField";
+import PasswordField from "./PasswordField";
 import { Card } from "./ui/card";
-import { GoogleSignInButton } from "@/app/(auth)/sign-in/_components/GoogleSignInButton";
 import { Separator } from "./ui/separator";
 
-// Schema generator based on form type
 const getAuthFormSchema = (type: FormType) =>
   z.object({
     name:
@@ -63,6 +63,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
           name: name!,
           email: email,
           password: password,
+          authProvider: "email",
         });
 
         if (!result?.success) {
@@ -70,9 +71,14 @@ const AuthForm = ({ type }: { type: FormType }) => {
           return;
         }
 
-        toast.success("Account created successfully! Please sign in.");
-        console.log("Sign up values:", values);
-        router.push("/sign-in");
+        const idToken = await userCredentials.user.getIdToken();
+        await signIn({
+          email,
+          idToken,
+        });
+
+        toast.success("Account created and signed in!");
+        router.push("/");
       } else {
         const { email, password } = values;
 
@@ -92,6 +98,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
         await signIn({
           email: email,
           idToken: idToken,
+          authProvider: "email",
         });
 
         toast.success("Signed in successfully!");
@@ -102,6 +109,19 @@ const AuthForm = ({ type }: { type: FormType }) => {
         toast.error("Email already in use. Please sign in.");
         return;
       }
+      if (error?.code === "auth/invalid-credential") {
+        toast.error("Invalid Credentials");
+        return;
+      }
+
+      if (error.code === "auth/too-many-requests") {
+        toast.error(
+          "Too many failed attempts. Please wait a few minutes and try again."
+        );
+        return;
+      }
+
+      toast.error(error?.code);
       console.error("Error signing in:", error);
     }
   };
@@ -149,12 +169,20 @@ const AuthForm = ({ type }: { type: FormType }) => {
               placeholder="Your Email"
               type="email"
             />
-            <FormField
+            {/* <FormField
               control={form.control}
               name="password"
               label="Password"
               placeholder="Your Password"
               type="password"
+            /> */}
+            <PasswordField
+              control={form.control}
+              name="password"
+              label="Password"
+              placeholder="Your Password"
+              type="password"
+              signUp={!isSignIn}
             />
 
             <Button type="submit" className="btn">

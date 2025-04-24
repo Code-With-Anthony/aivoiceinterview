@@ -32,7 +32,6 @@ export default function CreateCustomInterview({
   useEffect(() => {
     const fetchInterviewId = async () => {
       const interviews = await getInterviewsByUserId(user?.id!);
-      console.log("interviews: ", interviews);
       if (interviews && interviews.length > 0) {
         const id = interviews[0].id;
         setInterviewId(id);
@@ -60,7 +59,6 @@ export default function CreateCustomInterview({
   };
 
   const handleGenerateInterview = async () => {
-    console.log("data: ", formData);
     try {
       const response = await fetch("/api/vapi/generate", {
         method: "POST",
@@ -115,7 +113,6 @@ export default function CreateCustomInterview({
       toast.error("Please select generation option");
       return;
     }
-    console.log("option selected: ", option);
     setSelectedOption(option);
   };
 
@@ -128,7 +125,6 @@ export default function CreateCustomInterview({
       setStep(2); // Only change step here after navigation
     }
   }, [selectedOption]);
-  console.log("step: ", step);
 
   return (
     <div className="container px-24 lg:px-44 xl:px-56">

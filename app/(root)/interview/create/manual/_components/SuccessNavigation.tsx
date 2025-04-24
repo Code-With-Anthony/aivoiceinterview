@@ -16,9 +16,6 @@ import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
 const SuccessNavigation = ({ interviewId, formData }) => {
-  console.log("interviewId: ", interviewId);
-  console.log("formData: ", formData);
-
   const url = process.env.NEXT_PUBLIC_HOST_URL + "/" + interviewId;
   const GetInterviewUrl = () => {
     return url;

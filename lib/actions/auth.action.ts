@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
-    const { uid, name, email} = params;
+    const { uid, name, email, authProvider = "email"} = params;
 
     try {
         const userRecord = await db.collection("users").doc(uid).get();
@@ -21,6 +21,7 @@ export async function signUp(params: SignUpParams) {
         await db.collection("users").doc(uid).set({
             name,
             email,
+            authProvider,
         });
 
         return {
@@ -63,17 +64,41 @@ export async function setSessionCookie(idToken: string){
 }
 
 export async function signIn(params: SignInParams){
-    const {email, idToken} = params;
+    const {email, idToken, authProvider } = params;
     try {
+        // Step 1: Check if user exists in Firebase Auth
         const userRecord = await auth.getUserByEmail(email);
         
-        if (!userRecord) {
+        if (!userRecord && authProvider !== "google") {
             return {
                 success: false,
                 message: "User not found. Please sign up.",
             };
         }
-        await setSessionCookie(idToken);
+
+        // Step 2: Check if user document exists in Firestore
+    const userDoc = await db.collection("users").doc(userRecord.uid).get();
+
+    // Step 3: If missing, create it for Google Auth only
+    if (!userDoc.exists && authProvider === "google") {
+      await db.collection("users").doc(userRecord.uid).set({
+        name: userRecord.displayName || "New User",
+        email: userRecord.email,
+        authProvider: "google",
+        createdAt: new Date(),
+      });
+    } else if (!userDoc.exists) {
+      return {
+        success: false,
+        message: "User not found. Please sign up.",
+      };
+    }
+    // Step 4: Set session
+    await setSessionCookie(idToken);
+
+    return {
+        success: true,
+    }
     } catch (e) {
         console.error("Error Signing In:", e);
         
@@ -93,11 +118,16 @@ export async function getCurrentUser (): Promise<User | null >{
 
     try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+
         const userRecord = await db.collection("users").doc(decodedClaims.uid).get();
 
         if (!userRecord.exists) {
             return null;
         }
+
+        // Ensure data exists and matches your User type
+        const userData = userRecord.data();
+        if (!userData) return null;
 
         return {
             ...userRecord.data(),
