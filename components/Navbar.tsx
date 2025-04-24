@@ -37,7 +37,7 @@ const Navbar = () => {
   ];
 
   const userLinks = [
-    { label: "All Interviews", href: "/dashboard/interviews" },
+    { label: "All Interviews", href: "/interview/all" },
     // { label: "Take Interview", href: "/dashboard/take" },
     { label: "Create Interview", href: "/interview/create" },
     { label: "Analytics", href: "/dashboard/analytics" },
