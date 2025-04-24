@@ -11,7 +11,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { programmingLogosList } from "@/utils/TechIcons/programmingLogosList";
+import { programmingLogosList } from "@/public/TechIcons/programmingLogosList";
 import {
   ArrowLeft,
   ArrowRight,

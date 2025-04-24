@@ -9,13 +9,15 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import FormField from "./FormField";
+import { Card } from "./ui/card";
+import { GoogleSignInButton } from "@/app/(auth)/sign-in/_components/GoogleSignInButton";
+import { Separator } from "./ui/separator";
 
 // Schema generator based on form type
 const getAuthFormSchema = (type: FormType) =>
@@ -49,8 +51,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
       if (!isSignIn) {
-        // Simulate Sign Up
-
         const { name, email, password } = values;
         const userCredentials = await createUserWithEmailAndPassword(
           auth,
@@ -74,8 +74,6 @@ const AuthForm = ({ type }: { type: FormType }) => {
         console.log("Sign up values:", values);
         router.push("/sign-in");
       } else {
-        // Simulate Sign In
-
         const { email, password } = values;
 
         const userCredentials = await signInWithEmailAndPassword(
@@ -110,16 +108,27 @@ const AuthForm = ({ type }: { type: FormType }) => {
 
   return (
     <div className="card-border lg:min-w-[566px]">
-      <div className="card flex flex-col gap-6 py-14 px-10">
-        {/* Logo and Heading */}
-        <div className="flex justify-center items-center gap-2">
-          <Image src="/DarkAVILogo.png" width={38} height={38} alt="logo" />
-          <h2 className="text-primary-100">AI Voice Interview</h2>
+      <Card className="card flex flex-col gap-6 py-14 px-10 rounded-2xl">
+        <div className="text-center gap-2">
+          <h2 className="text-primary dark:text-[color:hsl(256,91%,58%)]">
+            AV!
+          </h2>
+          <p className="font-mona-sans mt-2">
+            Your Path to Confident Interviewing Starts Here.
+          </p>
         </div>
 
-        <h3 className="text-center">Practice Job Interviews With AI</h3>
+        <div className="max-w-md mx-auto w-full">
+          <GoogleSignInButton />
+        </div>
+        <div className="flex items-center gap-4 w-full">
+          <Separator className="flex-1" />
+          <span className="text-sm text-muted-foreground">
+            or continue with
+          </span>
+          <Separator className="flex-1" />
+        </div>
 
-        {/* Form */}
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -149,7 +158,11 @@ const AuthForm = ({ type }: { type: FormType }) => {
             />
 
             <Button type="submit" className="btn">
-              {isSignIn ? "Sign In" : "Create an Account"}
+              {form.formState.isSubmitting
+                ? "Please wait..."
+                : isSignIn
+                ? "Sign In"
+                : "Create an Account"}
             </Button>
           </form>
 
@@ -164,7 +177,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
             </Link>
           </p>
         </Form>
-      </div>
+      </Card>
     </div>
   );
 };

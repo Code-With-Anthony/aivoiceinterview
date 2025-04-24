@@ -1,4 +1,3 @@
-import { BreadCrumb } from "@/components/BreadCrumb";
 import FAQSection from "@/components/FAQSection";
 import FeaturesSection from "@/components/FeaturesSection";
 import HeroSection from "@/components/HeroSection";

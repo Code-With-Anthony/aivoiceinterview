@@ -5,6 +5,9 @@ import {
 } from "@/components/ui/popover";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Sparkles, BadgeCheck, CreditCard, Bell, LogOut } from "lucide-react";
+import Link from "next/link";
+import { signOut } from "@/lib/actions/auth.action";
+import { useRouter } from "next/navigation";
 
 interface User {
   name: string;
@@ -19,6 +22,12 @@ interface AccountProps {
 }
 
 export function Account({ user, handleNavigate }: AccountProps) {
+  const router = useRouter();
+  const handleSignOut = async () => {
+    await signOut();
+    router.push("/sign-in");
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -74,8 +83,13 @@ export function Account({ user, handleNavigate }: AccountProps) {
         <div className="border-t" />
 
         <div className="py-2 px-1">
-          <button className="menu-item text-red-500 hover:text-red-600">
-            <LogOut className="mr-2 h-4 w-4" />
+          <button
+            className="menu-item text-red-500 hover:text-red-600"
+            onClick={handleSignOut}
+          >
+            <Link href="/signout">
+              <LogOut className="mr-2 h-4 w-4" />
+            </Link>
             Log out
           </button>
         </div>

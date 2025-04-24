@@ -114,3 +114,29 @@ export async function isAuthenticated() {
     const user = await getCurrentUser();
     return !!user;
 }
+
+export async function signOut() {
+    try {
+        const cookieStore = await cookies();
+
+        // Clear the session cookie by setting it with a past expiration date
+        cookieStore.set("session", "", {
+            maxAge: 0,
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            path: "/",
+            sameSite: "lax",
+        });
+
+        return {
+            success: true,
+            message: "Signed out successfully.",
+        };
+    } catch (error) {
+        console.error("Error signing out:", error);
+        return {
+            success: false,
+            message: "Error signing out.",
+        };
+    }
+}

@@ -16,6 +16,9 @@ import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
 const SuccessNavigation = ({ interviewId, formData }) => {
+  console.log("interviewId: ", interviewId);
+  console.log("formData: ", formData);
+
   const url = process.env.NEXT_PUBLIC_HOST_URL + "/" + interviewId;
   const GetInterviewUrl = () => {
     return url;
@@ -52,10 +55,10 @@ const SuccessNavigation = ({ interviewId, formData }) => {
 
         <div className="flex gap-5">
           <h2 className="text-sm text-gray-500 flex gap-2 items-center">
-            <Clock className="h-4 w-4" /> 30 mins{formData?.duration}
+            <Clock className="h-4 w-4" /> {formData?.duration} Mins
           </h2>
           <h2 className="text-sm text-gray-500 flex gap-2 items-center">
-            <List className="h-4 w-4" /> 10 Question{formData?.question}
+            <List className="h-4 w-4" /> {formData?.question} Question
           </h2>
         </div>
       </div>

@@ -1,19 +1,49 @@
 "use client";
 
 import GenerationOptions from "@/app/(root)/interview/create/_components/GenerationOptions";
+import FormContainer from "@/app/(root)/interview/create/manual/_components/FormContainer";
+import SuccessNavigation from "@/app/(root)/interview/create/manual/_components/SuccessNavigation";
+import { getCurrentUser } from "@/lib/actions/auth.action";
+import { getInterviewsByUserId } from "@/lib/actions/general.action";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Progress } from "./ui/progress";
-import FormContainer from "@/app/(root)/interview/create/manual/_components/FormContainer";
-import SuccessNavigation from "@/app/(root)/interview/create/manual/_components/SuccessNavigation";
-import { getCurrentUser } from "@/lib/actions/auth.action";
-
-export default function CreateCustomInterview({ goToNextStep }) {
+export default function CreateCustomInterview({
+  goToNextStep,
+}: {
+  goToNextStep?: number;
+}) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({});
-  //   const user = getCurrentUser();
+  const [user, setUser] = useState(null);
+  const [interviewId, setInterviewId] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const userData = await getCurrentUser();
+      setUser(userData);
+    };
+
+    fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchInterviewId = async () => {
+      const interviews = await getInterviewsByUserId(user?.id!);
+      console.log("interviews: ", interviews);
+      if (interviews && interviews.length > 0) {
+        const id = interviews[0].id;
+        setInterviewId(id);
+      }
+    };
+
+    if (step === 3) {
+      fetchInterviewId();
+    }
+  }, [step]);
+
   const [selectedOption, setSelectedOption] = useState(null);
 
   useEffect(() => {
@@ -43,7 +73,7 @@ export default function CreateCustomInterview({ goToNextStep }) {
           level: formData.level,
           techstack: formData.techStack?.join(", "),
           amount: formData?.question,
-          userid: user?.id ?? "anonymous",
+          userid: user?.id,
         }),
       });
 
@@ -126,7 +156,7 @@ export default function CreateCustomInterview({ goToNextStep }) {
           />
         )}
         {step === 3 && (
-          <SuccessNavigation interviewId={123456} formData={formData} />
+          <SuccessNavigation interviewId={interviewId} formData={formData} />
         )}
       </div>
     </div>
