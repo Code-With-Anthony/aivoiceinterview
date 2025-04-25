@@ -27,16 +27,13 @@
 
 :root {
   --radius: 0.625rem;
-  --primary: hsl(256, 91%, 58%);
-  --text-root: #000000;
-  --background: #f4f6fa;
+  --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
-  --navbar-background: oklch(0.145 0 0 / 0.5);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  /* --primary: oklch(0.205 0 0); */
+  --primary: oklch(0.205 0 0);
   --primary-foreground: oklch(0.985 0 0);
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
@@ -65,21 +62,18 @@
 
 .dark {
   --background: oklch(0.145 0 0);
-  --primary: #fefeff;
-  --text-root: #ffffff;
   --foreground: oklch(0.985 0 0);
-  --navbar-background: oklch(27.8% 0.033 256.848)
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
+  --popover: oklch(0.269 0 0);
   --popover-foreground: oklch(0.985 0 0);
-  /* --primary: oklch(0.922 0 0); */
+  --primary: oklch(0.922 0 0);
   --primary-foreground: oklch(0.205 0 0);
   --secondary: oklch(0.269 0 0);
   --secondary-foreground: oklch(0.985 0 0);
   --muted: oklch(0.269 0 0);
-  --muted-foreground: var(--light-100);
-  --accent: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.371 0 0);
   --accent-foreground: oklch(0.985 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -97,7 +91,7 @@
   --sidebar-accent: oklch(0.269 0 0);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
 }
 
 @theme inline {
@@ -274,7 +268,7 @@
   }
 
   .root-layout {
-    @apply flex mx-auto max-w-7xl flex-col gap-12 my-12 px-16 max-sm:px-4 max-sm:my-8;
+    @apply flex mx-auto max-w-7xl flex-col px-16 max-sm:px-4 max-sm:my-8;
   }
 
     .section-padding {
@@ -291,7 +285,7 @@
         }
 
         a:hover {
-          @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
+          @apply bg-clip-text;
         }
 
   .card-cta {

@@ -19,6 +19,7 @@ import FormField from "./FormField";
 import PasswordField from "./PasswordField";
 import { Card } from "./ui/card";
 import { Separator } from "./ui/separator";
+import { useUserStore } from "@/lib/store/useUserStore";
 
 const getAuthFormSchema = (type: FormType) =>
   z.object({
@@ -35,6 +36,7 @@ const getAuthFormSchema = (type: FormType) =>
   });
 
 const AuthForm = ({ type }: { type: FormType }) => {
+  const setUser = useUserStore((state) => state.setUser);
   const isSignIn = type === "sign-in";
   const router = useRouter();
   const formSchema = getAuthFormSchema(type);
@@ -66,6 +68,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
           authProvider: "email",
         });
 
+        if (result.success) {
+          setUser({
+            id: userCredentials.user.uid,
+            name: name!,
+            email: email,
+            authProvider: "email",
+          });
+        }
+
         if (!result?.success) {
           toast.error(result?.message);
           return;
@@ -94,6 +105,12 @@ const AuthForm = ({ type }: { type: FormType }) => {
           toast.error("Error signing in. Please try again.");
           return;
         }
+        setUser({
+          id: userCredentials.user.uid,
+          name: userCredentials.user.displayName!,
+          email: userCredentials.user.email!,
+          authProvider: "email", //remember to change
+        });
 
         await signIn({
           email: email,

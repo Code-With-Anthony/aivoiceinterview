@@ -127,7 +127,7 @@ export default function CreateCustomInterview({
   }, [selectedOption]);
 
   return (
-    <div className="container px-24 lg:px-44 xl:px-56">
+    <div className="container px-24 lg:px-44 xl:px-56 mt-16">
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold gradient-text">

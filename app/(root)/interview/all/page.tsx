@@ -13,6 +13,7 @@ import Image from "next/image";
 import AvatarGroup from "./_components/AvatarGroup";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
+import DisplayTechIcons from "@/components/DisplayTechIcons";
 
 const Page = async () => {
   const user = await getCurrentUser();
@@ -84,8 +85,8 @@ const Page = async () => {
                 </span>
               </div>
               <div className="mt-6 flex items-center justify-between flex-wrap gap-4">
-                <div className="flex flex-wrap gap-2 overflow-hidden">
-                  <AvatarGroup techstack={i.techstack} />
+                <div className="flex flex-wrap gap-2">
+                  <DisplayTechIcons techStack={i.techstack} />
                 </div>
                 <Button className="shadow-none whitespace-nowrap">
                   Give Interview <ChevronRight />

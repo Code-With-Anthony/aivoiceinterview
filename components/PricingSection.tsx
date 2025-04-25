@@ -60,7 +60,7 @@ const PricingSection = () => {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Simple, <span className="gradient-text">Transparent Pricing</span>
           </h2>
-          <p className="text-lg text-gray-700">
+          <p className="text-lg dark:text-white text-gray-700">
             Choose the plan that&apos;s right for your business, with no hidden
             fees
           </p>
@@ -70,7 +70,7 @@ const PricingSection = () => {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`bg-white rounded-xl border ${
+              className={`rounded-xl border ${
                 plan.isPopular
                   ? "border-primary shadow-lg shadow-primary/10"
                   : "border-gray-200 shadow-sm"
@@ -90,13 +90,17 @@ const PricingSection = () => {
                   {typeof plan.price === "number" ? (
                     <>
                       <span className="text-4xl font-bold">${plan.price}</span>
-                      <span className="text-gray-500 ml-2">/month</span>
+                      <span className="dark:text-white text-gray-500 ml-2">
+                        /month
+                      </span>
                     </>
                   ) : (
                     <span className="text-4xl font-bold">{plan.price}</span>
                   )}
                 </div>
-                <p className="text-gray-600 mb-8">{plan.description}</p>
+                <p className="dark:text-white text-gray-600 mb-8">
+                  {plan.description}
+                </p>
 
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, i) => (
@@ -106,7 +110,7 @@ const PricingSection = () => {
                         size={18}
                       />
                       <span
-                        className={`text-gray-700 ${
+                        className={`dark:text-white text-gray-700 ${
                           i < 4 ? "" : "font-medium"
                         }`}
                       >
@@ -122,7 +126,7 @@ const PricingSection = () => {
                   className={`w-full py-6 ${
                     plan.isPopular
                       ? "bg-primary hover:bg-primary/90"
-                      : "bg-gray-900 hover:bg-gray-800"
+                      : "dark:bg-white  bg-gray-900 hover:bg-gray-800"
                   }`}
                 >
                   {plan.buttonText}
@@ -132,12 +136,12 @@ const PricingSection = () => {
           ))}
         </div>
 
-        <div className="mt-20 bg-gradient-to-r from-purple-50 to-indigo-50 rounded-2xl p-8 lg:p-12 max-w-5xl mx-auto">
+        <div className="mt-20 rounded-2xl p-8 lg:p-12 max-w-5xl mx-auto">
           <div className="text-center mb-8">
             <h3 className="text-2xl font-bold mb-4">
               Frequently Asked Questions About Pricing
             </h3>
-            <p className="text-gray-700">
+            <p className="dark:text-white text-gray-700">
               Find answers to common questions about our plans and billing
             </p>
           </div>
@@ -163,19 +167,19 @@ const PricingSection = () => {
             ].map((item, index) => (
               <div
                 key={index}
-                className="bg-white p-5 rounded-lg border border-gray-100"
+                className="p-5 rounded-lg border border-gray-100"
               >
                 <h4 className="font-semibold mb-2">{item.q}</h4>
-                <p className="text-gray-600">{item.a}</p>
+                <p className="dark:text-white text-gray-600">{item.a}</p>
               </div>
             ))}
           </div>
 
           <div className="text-center mt-10">
-            <p className="text-gray-700 mb-4">
+            <p className="dark:text-white text-gray-700 mb-4">
               Need a custom solution for your enterprise?
             </p>
-            <Button variant="outline" className="rounded-full px-8">
+            <Button variant="outline" className="rounded-lg px-8 h-12">
               Contact Our Sales Team
             </Button>
           </div>

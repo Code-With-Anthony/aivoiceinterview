@@ -1,16 +1,15 @@
-import Navbar from "@/components/Navbar";
-import { isAuthenticated } from "@/lib/actions/auth.action";
-import { redirect } from "next/navigation";
+import Navbar from "@/components/navbar/Navbar";
 import { ReactNode } from "react";
+import { AuthListener } from "../(auth)/auth-listener";
 
 const RootLayout = async ({ children }: { children: ReactNode }) => {
-  const isUserAuthenticated = await isAuthenticated();
-
-  if (!isUserAuthenticated) redirect("/sign-in");
   return (
     <div className="root-layout">
       <Navbar />
-      <div className="pt-16 md:pt-20 lg:pt-24">{children}</div>
+      <div className="pt-4 mt-6 md:pt-2 lg:pt-4">
+        <AuthListener />
+        {children}
+      </div>
     </div>
   );
 };

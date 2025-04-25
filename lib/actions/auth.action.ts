@@ -6,11 +6,11 @@ import { cookies } from "next/headers";
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
-    const { uid, name, email, authProvider = "email"} = params;
+    const { uid, name, email, authProvider = "email" } = params;
 
     try {
         const userRecord = await db.collection("users").doc(uid).get();
-        
+
         if (userRecord.exists) {
             return {
                 success: false,
@@ -32,7 +32,7 @@ export async function signUp(params: SignUpParams) {
     } catch (e: any) {
         console.error("Error Creating User:", e);
 
-        if(e?.code === 'auth/email-already-exists') {
+        if (e?.code === 'auth/email-already-exists') {
             return {
                 succuess: false,
                 message: "Email already exists",
@@ -47,7 +47,7 @@ export async function signUp(params: SignUpParams) {
 
 }
 
-export async function setSessionCookie(idToken: string){
+export async function setSessionCookie(idToken: string) {
     const cookitStore = await cookies();
 
     const sessionCookie = await auth.createSessionCookie(idToken, {
@@ -63,12 +63,12 @@ export async function setSessionCookie(idToken: string){
     })
 }
 
-export async function signIn(params: SignInParams){
-    const {email, idToken, authProvider } = params;
+export async function signIn(params: SignInParams) {
+    const { email, idToken, authProvider } = params;
     try {
         // Step 1: Check if user exists in Firebase Auth
         const userRecord = await auth.getUserByEmail(email);
-        
+
         if (!userRecord && authProvider !== "google") {
             return {
                 success: false,
@@ -77,31 +77,33 @@ export async function signIn(params: SignInParams){
         }
 
         // Step 2: Check if user document exists in Firestore
-    const userDoc = await db.collection("users").doc(userRecord.uid).get();
+        const userDoc = await db.collection("users").doc(userRecord.uid).get();
 
-    // Step 3: If missing, create it for Google Auth only
-    if (!userDoc.exists && authProvider === "google") {
-      await db.collection("users").doc(userRecord.uid).set({
-        name: userRecord.displayName || "New User",
-        email: userRecord.email,
-        authProvider: "google",
-        createdAt: new Date(),
-      });
-    } else if (!userDoc.exists) {
-      return {
-        success: false,
-        message: "User not found. Please sign up.",
-      };
-    }
-    // Step 4: Set session
-    await setSessionCookie(idToken);
+        // Step 3: If missing, create it for Google Auth only
+        if (!userDoc.exists && authProvider === "google") {
+            await db.collection("users").doc(userRecord.uid).set({
+                name: userRecord.displayName || "New User",
+                email: userRecord.email,
+                authProvider: "google",
+                createdAt: new Date(),
+            });
 
-    return {
-        success: true,
-    }
+        }
+        else if (!userDoc.exists) {
+            return {
+                success: false,
+                message: "User not found. Please sign up.",
+            };
+        }
+        // Step 4: Set session
+        await setSessionCookie(idToken);
+
+        return {
+            success: true,
+        }
     } catch (e) {
         console.error("Error Signing In:", e);
-        
+
         return {
             success: false,
             message: "Error signing in",
@@ -109,7 +111,7 @@ export async function signIn(params: SignInParams){
     }
 }
 
-export async function getCurrentUser (): Promise<User | null >{
+export async function getCurrentUser(): Promise<User | null> {
     const cookieStore = await cookies();
 
     const sessionCookie = cookieStore.get("session")?.value;
@@ -136,7 +138,7 @@ export async function getCurrentUser (): Promise<User | null >{
     } catch (error) {
         console.error("Error getting current user:", error);
         return null;
-        
+
     }
 }
 
