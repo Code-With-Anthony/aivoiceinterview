@@ -6,6 +6,7 @@ import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 
 export async function getInterviewsByUserId(userId: string): Promise<Interview[] | null> {
+    if (!userId) return null; // avoid invalid query
     const interviews = await db.collection("interviews").where("userId", "==", userId).orderBy('createdAt', 'desc').get();
     return interviews.docs.map((doc) => ({
         id: doc.id,
@@ -15,6 +16,7 @@ export async function getInterviewsByUserId(userId: string): Promise<Interview[]
 
 export async function getLatestInterviews(params: GetLatestInterviewsParams): Promise<Interview[] | null> {
     const {userId, limit = 20} = params;
+    if (!userId) return null; // avoid invalid query
     const interviews = await db
     .collection("interviews")
     .orderBy("createdAt", "desc")
@@ -29,12 +31,14 @@ export async function getLatestInterviews(params: GetLatestInterviewsParams): Pr
 }
 
 export async function getInterviewById(id: string): Promise<Interview | null> {
+    if(!id) return null;
     const interview = await db.collection("interviews").doc(id).get();
     return interview.data() as Interview | null;
 }
 
 export async function createFeedback(params: CreateFeedbackParams) {
     const {interviewId, userId, transcript} = params;
+    if(!interviewId || !userId || !transcript) return null;
 
     try {
         const formattedTranscript = transcript.map((sentence: {role: string; content: string}) => (
@@ -85,6 +89,7 @@ export async function createFeedback(params: CreateFeedbackParams) {
 
 export async function getFeedbackByInterviewId(params: GetFeedbackByInterviewIdParams): Promise<Feedback | null> {
     const {interviewId, userId} = params;
+    if(!interviewId || !userId) return null;
     const feedback = await db
     .collection("feedback")
     .where("interviewId", "==", interviewId)

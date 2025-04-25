@@ -12,27 +12,31 @@ import {
 
 const Page = async () => {
   const user = await getCurrentUser();
+
+  if (!user) {
+    return (
+      <>
+        <HeroSection />
+        <FeaturesSection />
+        <HowItWorksSection />
+        <PricingSection />
+        <FAQSection />
+      </>
+    );
+  }
+
   const [userInterviews, latestInterviews] = await Promise.all([
-    getInterviewsByUserId(user?.id!),
-    getLatestInterviews({ userId: user?.id! }),
+    getInterviewsByUserId(user.id),
+    getLatestInterviews({ userId: user.id }),
   ]);
 
   const hasPastInterviews = userInterviews?.length > 0;
   const hasUpcomingInterviews = latestInterviews?.length > 0;
+
   return (
     <>
-      {!user && (
-        <>
-          <HeroSection />
-          <FeaturesSection />
-          <HowItWorksSection />
-          <PricingSection />
-          <FAQSection />
-        </>
-      )}
       <section className="flex flex-col gap-6">
         <h2>Your Interviews</h2>
-        {/* <BreadCrumb items={[{ name: "Home", href: "/" }]} /> */}
         <div className="interviews-section">
           {hasPastInterviews ? (
             userInterviews?.map((interview) => (
@@ -41,11 +45,11 @@ const Page = async () => {
           ) : (
             <p>You haven&apos;t taken any interviews yet</p>
           )}
-          {/* <p>You haven&apos;t taken any interviews yet</p> */}
         </div>
       </section>
+
       <section className="flex flex-col gap-6 mt-8">
-        <h2>Taken an Interview</h2>
+        <h2>Take an Interview</h2>
         <div className="interviews-section">
           {hasUpcomingInterviews ? (
             latestInterviews?.map((interview) => (
