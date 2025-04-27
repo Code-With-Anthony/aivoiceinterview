@@ -148,9 +148,7 @@
   h3 {
     @apply text-2xl font-semibold;
   }
-  ul {
-    @apply list-disc list-inside;
-  }
+
   li {
     @apply dark:text-primary text-black;
   }
@@ -184,7 +182,7 @@
   }
 
   .navbar-primary {
-    @apply fixed top-0 left-0 right-0 z-50 transition-all duration-300
+    @apply fixed top-0 left-0 right-0 z-50 transition-all duration-300;
   }
 
   .card-border {
@@ -195,15 +193,15 @@
     @apply dark:dark-gradient rounded-2xl min-h-full;
   }
 
-    .container-padding {
-      @apply px-4 sm:px-6 lg:px-8;
-    }
+  .container-padding {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
 
   .form {
     @apply w-full;
 
     .label {
-      @apply  !font-semibold;
+      @apply !font-semibold;
     }
 
     .input {
@@ -271,22 +269,22 @@
     @apply flex mx-auto max-w-7xl flex-col px-16 max-sm:px-4 max-sm:my-8;
   }
 
-    .section-padding {
-      @apply py-16 md:py-24;
-    }
+  .section-padding {
+    @apply py-16 md:py-24;
+  }
 
-    .gradient-text {
-      @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
-    }
+  .gradient-text {
+    @apply bg-gradient-to-r from-purple-600 to-indigo-600 bg-clip-text text-transparent;
+  }
 
-        a {
-          @apply transition-all duration-500 ease-in-out;
-          /* Smooth transition */
-        }
+  a {
+    @apply transition-all duration-500 ease-in-out;
+    /* Smooth transition */
+  }
 
-        a:hover {
-          @apply bg-clip-text;
-        }
+  a:hover {
+    @apply bg-clip-text;
+  }
 
   .card-cta {
     @apply flex !flex-row blue-gradient-dark rounded-3xl px-16 py-6 items-center justify-between max-sm:px-4;
@@ -296,9 +294,9 @@
     @apply flex flex-wrap gap-4 max-lg:flex-col w-full items-stretch;
   }
 
-    .menu-item {
-      @apply flex w-full items-center px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors;
-    }
+  .menu-item {
+    @apply flex w-full items-center px-4 py-2 text-sm hover:bg-muted rounded-md transition-colors;
+  }
 
   .interview-text {
     @apply text-lg text-center text-white;

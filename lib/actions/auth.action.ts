@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
-    const { uid, name, email, authProvider = "email" } = params;
+    const { uid, name, email, authProvider = "email", password, role } = params;
 
     try {
         const userRecord = await db.collection("users").doc(uid).get();
@@ -21,6 +21,8 @@ export async function signUp(params: SignUpParams) {
         await db.collection("users").doc(uid).set({
             name,
             email,
+            role,
+            password,
             authProvider,
         });
 
@@ -34,7 +36,7 @@ export async function signUp(params: SignUpParams) {
 
         if (e?.code === 'auth/email-already-exists') {
             return {
-                succuess: false,
+                success: false,
                 message: "Email already exists",
             }
         }

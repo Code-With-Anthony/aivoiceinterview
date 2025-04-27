@@ -12,12 +12,13 @@ import { signOut } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";
 
 const NavUser = () => {
-  const { user } = useUserStore((state) => state);
+  const { user, clearUser } = useUserStore((state) => state);
   const router = useRouter();
 
   const handleSignOut = async () => {
     await signOut();
-    router.push("/sign-in");
+    clearUser();
+    router.push("/");
   };
 
   return (

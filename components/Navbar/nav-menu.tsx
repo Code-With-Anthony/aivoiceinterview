@@ -17,8 +17,7 @@ interface NavMenuProps extends NavigationMenuProps {
 
 export const NavMenu = ({ onLinkClick, ...props }: NavMenuProps) => {
   const { user } = useUserStore((state) => state);
-  console.log("user details: ", user);
-  const isCandidate = user?.role === "candidate"; // Check if the user is a candidate
+  const isCandidate = user?.role === "candidate";
 
   return (
     <NavigationMenu {...props}>

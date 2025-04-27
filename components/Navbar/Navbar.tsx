@@ -200,7 +200,6 @@ import NavUser from "./nav-user";
 
 const Navbar = () => {
   const { user } = useUserStore((state) => state);
-  console.log("user in navbar", user);
   return (
     <div className="!z-50">
       <nav className="fixed top-6 inset-x-4 h-16 border max-w-screen-xl mx-auto rounded-full backdrop-blur-md dark:border-white/20 dark:bg-black/10">
@@ -219,9 +218,12 @@ const Navbar = () => {
                   variant="outline"
                   className="hidden sm:inline-flex rounded-full"
                 >
-                  Sign In
+                  <Link href="/sign-in">Sign In</Link>
                 </Button>
-                <Button className="rounded-full">Get Started</Button>
+                <Button className="rounded-full">
+                  <Link href="/sign-up">Get Started</Link>
+                </Button>
+                <ToogleMode />
               </>
             ) : (
               <>

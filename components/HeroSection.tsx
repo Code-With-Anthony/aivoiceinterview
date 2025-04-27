@@ -9,9 +9,8 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="fade-in">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              Transform Your{" "}
-              <span className="gradient-text">Hiring Process</span> with AI
-              Interviews
+              Transform Your <span className="gradient-text">Hiring </span>
+              Process with <span className="gradient-text">AV!</span>
             </h1>
             <p className="text-lg md:text-xl text-gray-700 mb-8 max-w-xl">
               Our AI-powered voice agent conducts professional interviews,

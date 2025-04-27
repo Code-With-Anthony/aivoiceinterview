@@ -11,7 +11,7 @@ const SignOutPage = () => {
     const signOutUser = async () => {
       await auth.signOut(); // Firebase sign out (optional)
       await fetch("/api/logout", { method: "POST" }); // clears session cookie
-      router.push("/sign-in");
+      router.push("/");
     };
 
     signOutUser();

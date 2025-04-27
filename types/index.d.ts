@@ -77,11 +77,14 @@ interface SignInParams {
   authProvider? : string;
 }
 
+type UserRole = "candidate" | "recruiter"
+
 interface SignUpParams {
   uid: string;
   name: string;
   email: string;
   password?: string;
+  role: UserRole;
   authProvider: string;
 }
 

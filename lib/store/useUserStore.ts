@@ -22,7 +22,13 @@ export const useUserStore = create<UserState>()(
     (set) => ({
       user: null,
       setUser: (user) => set({ user }),
-      clearUser: () => set({ user: null }),
+      clearUser: () => {
+        set({ user: null });
+        // Clear the persisted storage
+        localStorage.removeItem("user-storage");
+        localStorage.removeItem("token");
+      },
+      
       hasHydrated: false,
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
     }),
