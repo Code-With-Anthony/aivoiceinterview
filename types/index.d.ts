@@ -36,6 +36,7 @@ interface User {
   name: string;
   email: string;
   id: string;
+  role: string;
 }
 
 interface InterviewCardProps {
@@ -74,7 +75,7 @@ interface GetLatestInterviewsParams {
 interface SignInParams {
   email: string;
   idToken: string;
-  authProvider? : string;
+  authProvider?: string;
 }
 
 type UserRole = "candidate" | "recruiter"

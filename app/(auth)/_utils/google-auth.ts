@@ -1,5 +1,5 @@
 import { auth, provider } from "@/firebase/client";
-import { signIn, signUp } from "@/lib/actions/auth.action";
+import { getCurrentUser, signIn } from "@/lib/actions/auth.action";
 import { signInWithPopup } from "firebase/auth";
 import { toast } from "sonner";
 
@@ -7,6 +7,7 @@ export const handleGoogleAuth = async (router: any) => {
   try {
     const result = await signInWithPopup(auth, provider);
     const user = result.user;
+    const userDetails = await getCurrentUser();
 
     const idToken = await user.getIdToken();
 
@@ -14,28 +15,24 @@ export const handleGoogleAuth = async (router: any) => {
     const signInResult = await signIn({
       email: user.email!,
       idToken,
+      authProvider: "google"
     });
 
-    if (signInResult?.success === false) {
-      // If sign-in fails, try to create a new user
-      const signUpResult = await signUp({
-        uid: user.uid,
-        name: user.displayName!,
-        email: user.email!,
-        authProvider: "google",
-      });
-
-      if (signUpResult?.success) {
-        toast.success("Account created successfully!");
-      } else {
-        toast.error(signUpResult.message || "Sign up failed");
-        return;
-      }
-    } else {
+    if (signInResult?.success === true) {
       toast.success("Signed in successfully!");
     }
+    else {
+      toast.error(signInResult.message);
+      return;
+    }
 
-    router.push("/");
+    if (userDetails?.role === "candidate") {
+      router.psuh("/candidate");
+    }
+    else if (userDetails?.role === "recruiter") {
+      router.push("/recruiter")
+    }
+
   } catch (error) {
     console.error("Google Auth Error:", error);
     toast.error("Google sign-in failed");

@@ -73,34 +73,30 @@ export async function setSessionCookie(idToken: string) {
 
 export async function signIn(params: SignInParams) {
     const { email, idToken, authProvider } = params;
+    if (!email || !idToken || !authProvider) {
+        return {
+            success: false,
+            message: "All fields are neccessary"
+        }
+    }
     try {
         // Step 1: Check if user exists in Firebase Auth
         const userRecord = await auth.getUserByEmail(email);
 
-        if (!userRecord && authProvider !== "google") {
+        if (!userRecord) {
             return {
                 success: false,
-                message: "User not found. Please sign up.",
+                message: "New User Detected. Please Signup",
             };
         }
 
         // Step 2: Check if user document exists in Firestore
         const userDoc = await db.collection("users").doc(userRecord.uid).get();
 
-        // Step 3: If missing, create it for Google Auth only
-        if (!userDoc.exists && authProvider === "google") {
-            await db.collection("users").doc(userRecord.uid).set({
-                name: userRecord.displayName || "New User",
-                email: userRecord.email,
-                authProvider: "google",
-                createdAt: new Date(),
-            });
-
-        }
-        else if (!userDoc.exists) {
+        if (!userDoc.exists) {
             return {
                 success: false,
-                message: "User not found. Please sign up.",
+                message: "New User Detected. Please Signup",
             };
         }
         // Step 4: Set session
@@ -108,6 +104,7 @@ export async function signIn(params: SignInParams) {
 
         return {
             success: true,
+            user: userDoc.data()
         }
     } catch (e) {
         console.error("Error Signing In:", e);

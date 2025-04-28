@@ -3,7 +3,11 @@ import React from "react";
 import { motion } from "motion/react";
 import { cn } from "@/lib/utils";
 
-export function LampDemo() {
+interface PageType {
+  page?: string;
+}
+
+export function LampDemo({ page }: PageType) {
   return (
     <LampContainer>
       <motion.h1
@@ -16,7 +20,15 @@ export function LampDemo() {
         }}
         className="mt-8 bg-gradient-to-br from-slate-300 to-slate-500 py-4 bg-clip-text text-center text-4xl font-medium tracking-tight text-transparent md:text-7xl"
       >
-        Revolutionizing Interviews <br /> with AV!
+        {page !== "login" ? (
+          <>
+            Revolutionizing Interviews <br /> with AV!
+          </>
+        ) : (
+          <>
+            Transformational, Transparent <br /> Hirings with AV!
+          </>
+        )}
       </motion.h1>
     </LampContainer>
   );

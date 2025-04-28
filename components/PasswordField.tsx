@@ -8,7 +8,7 @@ import { Label } from "./ui/label";
 type FormFieldProps<T extends FieldValues> = {
   control: Control<T>;
   name: Path<T>;
-  label: string;
+  label?: string;
   placeholder: string;
   type?: string;
   signUp: boolean;
@@ -41,7 +41,7 @@ const PasswordField = <T extends FieldValues>({
       name={name}
       render={({ field, fieldState }) => (
         <FormItem>
-          <Label htmlFor={name}>{label}</Label>
+          {label && <Label htmlFor={name}>{label}</Label>}
           <FormControl>
             <div className="relative select-none">
               <Input
