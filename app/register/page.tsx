@@ -1,6 +1,7 @@
 import { GalleryVerticalEnd } from "lucide-react";
 import Link from "next/link";
 import { RegisterForm } from "@/components/register-form";
+import { LampDemo } from "@/components/ui/lamp";
 
 export default function RegisterPage() {
   return (
@@ -21,11 +22,12 @@ export default function RegisterPage() {
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
-        <img
+        {/* <img
           src="/placeholder.svg"
           alt="Image"
           className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-        />
+        /> */}
+        <LampDemo />
       </div>
     </div>
   );

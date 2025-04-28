@@ -39,26 +39,28 @@ const PasswordField = <T extends FieldValues>({
     <FormField
       control={control}
       name={name}
-      render={({ field }) => (
+      render={({ field, fieldState }) => (
         <FormItem>
           <Label htmlFor={name}>{label}</Label>
           <FormControl>
-            <div className="relative">
+            <div className="relative select-none">
               <Input
                 type={isView ? "text" : type} // Toggle between text and password
                 id={name}
-                className="input select-none"
+                className={`input select-none ${
+                  fieldState.error ? "border-red-500" : ""
+                }`}
                 placeholder={placeholder || "Enter your password"}
                 {...field}
               />
               {isView ? (
                 <Eye
-                  className="absolute right-4 top-4 z-10 cursor-pointer text-gray-500"
+                  className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
                   onClick={() => setIsView(!isView)}
                 />
               ) : (
                 <EyeOff
-                  className="absolute right-4 top-4 z-10 cursor-pointer text-gray-500"
+                  className="absolute right-4 top-2 z-10 cursor-pointer text-gray-500"
                   onClick={() => setIsView(!isView)}
                 />
               )}

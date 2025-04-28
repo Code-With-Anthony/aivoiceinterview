@@ -6,7 +6,14 @@ import { cookies } from "next/headers";
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
-    const { uid, name, email, authProvider = "email", password, role } = params;
+    const { uid, name, email, authProvider = "email", role } = params;
+
+    if (!uid || !name || !email || !authProvider || !role) {
+        return {
+            success: false,
+            message: "Please fill all the fields"
+        }
+    }
 
     try {
         const userRecord = await db.collection("users").doc(uid).get();
@@ -22,7 +29,6 @@ export async function signUp(params: SignUpParams) {
             name,
             email,
             role,
-            password,
             authProvider,
         });
 

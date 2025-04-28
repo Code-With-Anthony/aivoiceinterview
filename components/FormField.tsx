@@ -7,6 +7,7 @@ import {
   FormField as ShadFormField,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import React, { ReactNode } from "react";
 
 interface FormFieldProps<T extends FieldValues> {
   name: Path<T>;
@@ -14,6 +15,7 @@ interface FormFieldProps<T extends FieldValues> {
   label?: string;
   placeholder?: string;
   type?: "text" | "email" | "password" | "file";
+  children?: (field: any, fieldState: any) => ReactNode;
 }
 
 const FormField = <T extends FieldValues>({
@@ -22,20 +24,25 @@ const FormField = <T extends FieldValues>({
   label,
   placeholder,
   type = "text",
+  children,
 }: FormFieldProps<T>) => (
   <ShadFormField
     name={name}
     control={control}
-    render={({ field }) => (
+    render={({ field, fieldState }) => (
       <FormItem>
         <FormLabel className="label">{label}</FormLabel>
         <FormControl>
-          <Input
-            className="input"
-            placeholder={placeholder}
-            {...field}
-            type={type}
-          />
+          {typeof children === "function" ? (
+            children(field, fieldState) // 👉 now child gets both field and error
+          ) : (
+            <Input
+              className="input"
+              placeholder={placeholder}
+              {...field}
+              type={type}
+            />
+          )}
         </FormControl>
         <FormMessage />
       </FormItem>
