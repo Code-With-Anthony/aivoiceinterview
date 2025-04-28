@@ -8,7 +8,7 @@ const page = () => {
   return (
     <div>
       <SectionCards />
-      <div className="px-4 lg:px-6">
+      <div className="px-4 lg:px-6 mt-8 mb-8">
         <ChartAreaInteractive />
       </div>
       <DataTable data={data} />

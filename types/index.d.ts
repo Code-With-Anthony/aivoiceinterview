@@ -81,7 +81,6 @@ interface SignInParams {
 type UserRole = "candidate" | "recruiter"
 
 interface SignUpParams {
-  uid: string;
   name: string;
   email: string;
   password?: string;

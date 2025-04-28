@@ -1,31 +1,48 @@
 "use server";
 
 import { auth, db } from "@/firebase/admin";
+import { auth as clientAuth } from "@/firebase/client"
+import { getAuth } from "firebase-admin/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { cookies } from "next/headers";
 
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
-    const { uid, name, email, authProvider = "email", role } = params;
+    const { name, email, authProvider = "email", role, password } = params;
 
-    if (!uid || !name || !email || !authProvider || !role) {
+    if (!name || !email || !authProvider || !role || !password) {
         return {
             success: false,
-            message: "Please fill all the fields"
         }
     }
 
     try {
-        const userRecord = await db.collection("users").doc(uid).get();
-
-        if (userRecord.exists) {
+        // Check if the user exists in Firebase Authentication
+        const userExists = await checkIfUserExists(email);
+        if (userExists) {
             return {
                 success: false,
                 message: "User already exists. Please sign in instead.",
             };
         }
 
-        await db.collection("users").doc(uid).set({
+        // const userRecord = await db.collection("users").doc(userExists?.uid).get();
+
+        // if (userRecord.exists) {
+        //     return {
+        //         success: false,
+        //         message: "User already exists. Please sign in instead.",
+        //     };
+        // }
+
+        const newUser = await createUserWithEmailAndPassword(
+            clientAuth,
+            email as string,
+            password as string
+        );
+
+        await db.collection("users").doc(newUser.user.uid).set({
             name,
             email,
             role,
@@ -34,6 +51,8 @@ export async function signUp(params: SignUpParams) {
 
         return {
             success: true,
+            userId: newUser.user.uid,
+            idToke: newUser.user.getIdToken(),
             message: "User created successfully. Please sign in.",
         }
 
@@ -53,6 +72,21 @@ export async function signUp(params: SignUpParams) {
         }
     }
 
+}
+
+// Helper function to check if a user already exists in Firebase Authentication
+export async function checkIfUserExists(email: string) {
+    const auth = getAuth();
+    try {
+        const userRecord = await auth.getUserByEmail(email);
+        return userRecord ? userRecord : null;
+    } catch (error) {
+        if (error?.code === 'auth/user-not-found') {
+            return false; // User doesn't exist
+        }
+        console.error('Error checking user existence:', error);
+        return false;
+    }
 }
 
 export async function setSessionCookie(idToken: string) {
@@ -96,7 +130,7 @@ export async function signIn(params: SignInParams) {
         if (!userDoc.exists) {
             return {
                 success: false,
-                message: "New User Detected. Please Signup",
+                message: "Something went wrong while fetching user",
             };
         }
         // Step 4: Set session
@@ -104,7 +138,7 @@ export async function signIn(params: SignInParams) {
 
         return {
             success: true,
-            user: userDoc.data()
+            user: userDoc.data(),
         }
     } catch (e) {
         console.error("Error Signing In:", e);

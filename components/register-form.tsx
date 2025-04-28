@@ -1,12 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -60,23 +58,17 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
         return;
       }
 
-      const userCredentials = await createUserWithEmailAndPassword(
-        auth,
-        email as string,
-        password as string
-      );
-
       const result = await signUp({
-        uid: userCredentials.user.uid,
         name: name as string,
         email: email as string,
         role: role as UserRole,
         authProvider: "email",
+        password: password,
       });
 
       if (result.success) {
         setUser({
-          id: userCredentials.user.uid,
+          id: result.userId as string,
           name: name as string,
           email: email as string,
           role: role as string,
@@ -89,16 +81,12 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
         return;
       }
 
-      const idToken = await userCredentials.user.getIdToken();
       await signIn({
         email: email as string,
-        idToken,
+        idToken: await result.idToke!,
       });
 
       toast.success("Account created and signed in!");
-
-      // Reset the form before redirection
-      form.reset();
 
       if (role === "candidate") {
         router.push("/candidate");
@@ -196,7 +184,7 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
         </div>
         <div className="text-center text-sm">
           Already have an account?{" "}
-          <a href="/login" className="underline underline-offset-4">
+          <a href="/sign-in" className="underline underline-offset-4">
             Login
           </a>
         </div>

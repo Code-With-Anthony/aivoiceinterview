@@ -1,6 +1,6 @@
 "use client";
 
-import { handleGoogleAuth } from "@/app/(auth)/_utils/google-auth";
+import { useGoogleAuth } from "@/app/(auth)/_utils/google-auth";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { auth } from "@/firebase/client";
@@ -30,6 +30,7 @@ export function LoginForm({
   const setUser = useUserStore((state) => state.setUser);
   const router = useRouter();
   const formSchema = getAuthFormSchema();
+  const { handleGoogleAuth } = useGoogleAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -160,7 +161,7 @@ export function LoginForm({
             variant="outline"
             className="w-full"
             type="button"
-            onClick={() => handleGoogleAuth(router)}
+            onClick={handleGoogleAuth}
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
               <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
@@ -170,7 +171,7 @@ export function LoginForm({
         </div>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
-          <a href="/register" className="underline underline-offset-4">
+          <a href="/sign-up" className="underline underline-offset-4">
             Sign up
           </a>
         </div>
