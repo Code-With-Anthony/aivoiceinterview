@@ -9,7 +9,6 @@ import {
 import { useUserStore } from "@/lib/store/useUserStore";
 import { NavigationMenuProps } from "@radix-ui/react-navigation-menu";
 import Link from "next/link";
-import NavUser from "./nav-user";
 
 interface NavMenuProps extends NavigationMenuProps {
   onLinkClick?: () => void;
@@ -80,14 +79,6 @@ export const NavMenu = ({ onLinkClick, ...props }: NavMenuProps) => {
             </Link>
           </NavigationMenuLink>
         </NavigationMenuItem>
-
-        {props.orientation === "vertical" && (
-          <NavigationMenuItem>
-            <NavigationMenuLink asChild>
-              <NavUser />
-            </NavigationMenuLink>
-          </NavigationMenuItem>
-        )}
       </NavigationMenuList>
     </NavigationMenu>
   );

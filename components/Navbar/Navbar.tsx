@@ -227,9 +227,7 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <div className="md:block hidden">
-                  <NavUser />
-                </div>
+                <NavUser />
                 <ToogleMode />
               </>
             )}

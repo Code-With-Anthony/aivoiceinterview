@@ -11,7 +11,6 @@ const page = async ({ params }: RouteParams) => {
   const user = await getCurrentUser();
 
   const interview = await getInterviewById(id);
-  console.log("interview techstack", interview);
   if (!interview) redirect("/");
   return (
     <>
@@ -29,7 +28,7 @@ const page = async ({ params }: RouteParams) => {
           </div>
           <DisplayTechIcons techStack={interview.techstack} />
         </div>
-        <p className="bg-dark-200 px-4 py-4 rounded-lg h-fit capitalize">
+        <p className="dark:bg-white dark:text-black bg-dark-200 text-white px-3 py-3 rounded-lg h-fit capitalize">
           {interview.type}
         </p>
       </div>
