@@ -3,6 +3,14 @@ import { getCurrentUser } from "@/lib/actions/auth.action";
 import { getLatestInterviews } from "@/lib/actions/general.action";
 import { PlusIcon } from "lucide-react";
 import InterviewCard from "./_components/InterviewCard";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 const Page = async () => {
   const user = await getCurrentUser();
@@ -24,10 +32,20 @@ const Page = async () => {
     <div className="px-4 py-8 sm:px-6 lg:px-12">
       <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
         <div className="flex gap-3 items-center w-full sm:w-auto">
-          <input
-            type="text"
-            placeholder="Search interviews..."
-            className="w-full sm:w-72 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary"
+          <Select>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="All" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Input
+            type="search"
+            placeholder="Search Interview"
+            className="sm:w-72 px-4 py-2 focus:outline-none"
           />
           <select className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-primary">
             <option>All Status</option>
