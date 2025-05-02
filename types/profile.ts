@@ -76,3 +76,20 @@ export interface SocialMedia {
     github?: string
     stackoverflow?: string
 }
+
+export interface Interview {
+    id: string
+    companyName: string
+    companyLogo?: string
+    name: string
+    type: string
+    level: string
+    score: number | null
+    date: {
+        type: "permanent" | "future" | "limited"
+        value: string
+    }
+    description: string
+    techStack: string[]
+    completed: boolean
+}
