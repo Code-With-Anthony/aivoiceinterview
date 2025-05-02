@@ -67,7 +67,7 @@ export function LoginForm({
         toast.success("Signed in successfully!");
         setUser({
           id: userCredentials.user.uid,
-          name: userCredentials.user.displayName!,
+          name: signInResult.user?.name,
           email: userCredentials.user.email!,
           role: signInResult.user?.role,
           authProvider: "email",
@@ -78,7 +78,7 @@ export function LoginForm({
       form.reset();
 
       if (signInResult?.user?.role === "candidate") {
-        router.push("/candidate");
+        router.push("/");
       } else if (signInResult?.user?.role === "recruiter") {
         router.push("/recruiter");
       }

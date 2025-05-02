@@ -5,11 +5,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
-import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from "lucide-react";
-import { useUserStore } from "@/lib/store/useUserStore";
 import { signOut } from "@/lib/actions/auth.action";
+import { useUserStore } from "@/lib/store/useUserStore";
+import { BadgeCheck, Bell, CreditCard, LogOut, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 const NavUser = () => {
   const { user, clearUser } = useUserStore((state) => state);

@@ -9,6 +9,7 @@ import {
   getInterviewsByUserId,
   getLatestInterviews,
 } from "@/lib/actions/general.action";
+import { redirect } from "next/navigation";
 
 const Page = async () => {
   const user = await getCurrentUser();
@@ -24,6 +25,8 @@ const Page = async () => {
       </>
     );
   }
+
+  if (user?.role === "recruiter") redirect("/recruiter/dashboard");
 
   const [userInterviews, latestInterviews] = await Promise.all([
     getInterviewsByUserId(user.id),
