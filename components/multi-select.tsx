@@ -62,7 +62,7 @@ interface MultiSelectProps
     /** The unique value associated with the option. */
     value: string;
     /** Optional icon component to display alongside the option. */
-    icon?: React.ComponentType<{ className?: string }>;
+    icon?: string;
   }[];
 
   /**
@@ -212,9 +212,11 @@ export const MultiSelect = React.forwardRef<
                       >
                         {IconComponent && (
                           <Image
-                            src={option.icon}
-                            className="h-4 w-4 mr-2"
+                            src={option.icon ?? ""}
                             alt={option.label}
+                            className="h-4 w-4 mr-2"
+                            width={16}
+                            height={16}
                           />
                         )}
                         {option?.label}
@@ -324,7 +326,9 @@ export const MultiSelect = React.forwardRef<
                         <Image
                           src={option.icon}
                           alt={option.label}
-                          className="mr-2 h-4 w-4 text-muted-foreground"
+                          className="h-4 w-4 mr-2"
+                          width={16}
+                          height={16}
                         />
                       )}
                       <span>{option.label}</span>

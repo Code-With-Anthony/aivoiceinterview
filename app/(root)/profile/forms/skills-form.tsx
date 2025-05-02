@@ -1,11 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { Input } from "@/components/ui/input";
+import { MultiSelect } from "@/components/multi-select";
+import { Badge } from "@/components/ui/badge";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { programmingLogosList } from "@/public/TechIcons/programmingLogosList";
 import type { UserProfile } from "@/types/profile";
-import { X, Plus } from "lucide-react";
+import { X } from "lucide-react";
+import Image from "next/image";
+import { useEffect, useState } from "react";
 
 interface SkillsFormProps {
   skills?: string[];
@@ -16,60 +18,72 @@ export default function SkillsForm({
   skills,
   updateFormData,
 }: SkillsFormProps) {
-  const [formState, setFormState] = useState<string[]>(skills || []);
-  const [newSkill, setNewSkill] = useState("");
-
-  const addSkill = () => {
-    if (newSkill.trim()) {
-      const updatedSkills = [...formState, newSkill.trim()];
-      setFormState(updatedSkills);
-      updateFormData({ skills: updatedSkills });
-      setNewSkill("");
-    }
-  };
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(
+    skills || []
+  );
 
   const removeSkill = (index: number) => {
-    const updatedSkills = formState.filter((_, i) => i !== index);
-    setFormState(updatedSkills);
+    const updatedSkills = selectedFrameworks.filter((_, i) => i !== index);
+    setSelectedFrameworks(updatedSkills);
     updateFormData({ skills: updatedSkills });
   };
+
+  useEffect(() => {
+    setSelectedFrameworks(selectedFrameworks);
+    updateFormData({ skills: selectedFrameworks });
+    console.log("called called");
+  }, [selectedFrameworks]);
 
   return (
     <div className="space-y-6">
       <div className="space-y-4">
         <Label>Skills</Label>
         <div className="flex flex-wrap gap-2 mb-2">
-          {formState.map((skill, index) => (
-            <div
-              key={index}
-              className="flex items-center bg-muted px-3 py-1 rounded-full"
-            >
-              <span className="mr-1">{skill}</span>
-              <button
-                type="button"
-                onClick={() => removeSkill(index)}
-                className="text-muted-foreground hover:text-foreground"
-              >
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-          ))}
+          {selectedFrameworks.length > 0 ? (
+            selectedFrameworks.map((skill, index) => {
+              const matched = programmingLogosList.find(
+                (item) => item.value.toLowerCase() === skill.toLowerCase()
+              );
+              return (
+                <Badge
+                  key={index}
+                  variant="outline"
+                  className="px-3 py-1 text-sm"
+                >
+                  {matched?.icon && (
+                    <Image
+                      src={matched.icon}
+                      alt={skill}
+                      width={16}
+                      height={16}
+                      className="inline-block"
+                    />
+                  )}
+                  {skill}
+                  <button
+                    type="button"
+                    onClick={() => removeSkill(index)}
+                    className="text-muted-foreground hover:text-foreground cursor-pointer"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </Badge>
+              );
+            })
+          ) : (
+            <p>No skills listed</p>
+          )}
         </div>
-        <div className="flex gap-2">
-          <Input
-            value={newSkill}
-            onChange={(e) => setNewSkill(e.target.value)}
-            placeholder="Add a skill"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                addSkill();
-              }
-            }}
+        <div>
+          <MultiSelect
+            options={programmingLogosList}
+            onValueChange={setSelectedFrameworks}
+            defaultValue={selectedFrameworks}
+            placeholder="Select frameworks"
+            variant="inverted"
+            animation={2}
+            maxCount={4}
           />
-          <Button type="button" onClick={addSkill} size="sm">
-            <Plus className="h-4 w-4" />
-          </Button>
         </div>
       </div>
     </div>

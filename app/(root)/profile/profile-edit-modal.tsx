@@ -2,24 +2,23 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import type { UserProfile } from "@/types/profile";
-// import BasicInfoForm from "./forms/basic-info-form";
+import { useState } from "react";
+import CertificationsForm from "./forms/certifications-form";
+import ExperienceForm from "./forms/experience-form";
 import PersonalDetailsForm from "./forms/personal-details-form";
 import ProfessionalDetailsForm from "./forms/professional-details-form";
-import ExperienceForm from "./forms/experience-form";
-import SkillsForm from "./forms/skills-form";
-import TrainingsForm from "./forms/trainings-form";
-import CertificationsForm from "./forms/certifications-form";
 import ProjectsForm from "./forms/projects-form";
+import SkillsForm from "./forms/skills-form";
 import SocialMediaForm from "./forms/social-media-form";
+import TrainingsForm from "./forms/trainings-form";
 
 interface ProfileEditModalProps {
   isOpen: boolean;
@@ -49,10 +48,6 @@ export default function ProfileEditModal({
 
   const renderForm = () => {
     switch (section) {
-      //   case "basic":
-      //     return (
-      //       <BasicInfoForm userData={userData} updateFormData={updateFormData} />
-      //     );
       case "personal":
         return (
           <PersonalDetailsForm
