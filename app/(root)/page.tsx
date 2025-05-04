@@ -28,43 +28,45 @@ const Page = async () => {
 
   if (user?.role === "recruiter") redirect("/recruiter/dashboard");
 
-  const [userInterviews, latestInterviews] = await Promise.all([
-    getInterviewsByUserId(user.id),
-    getLatestInterviews({ userId: user.id }),
-  ]);
+  if (user?.role === "candidate") redirect("/dashboard");
 
-  const hasPastInterviews = userInterviews?.length > 0;
-  const hasUpcomingInterviews = latestInterviews?.length > 0;
+  // const [userInterviews, latestInterviews] = await Promise.all([
+  //   getInterviewsByUserId(user.id),
+  //   getLatestInterviews({ userId: user.id }),
+  // ]);
 
-  return (
-    <>
-      <section className="flex flex-col gap-6">
-        <h2>Your Interviews</h2>
-        <div className="interviews-section">
-          {hasPastInterviews ? (
-            userInterviews?.map((interview) => (
-              <InterviewCard {...interview} key={interview.id} />
-            ))
-          ) : (
-            <p>You haven&apos;t taken any interviews yet</p>
-          )}
-        </div>
-      </section>
+  // const hasPastInterviews = userInterviews?.length > 0;
+  // const hasUpcomingInterviews = latestInterviews?.length > 0;
 
-      <section className="flex flex-col gap-6 mt-8">
-        <h2>Take an Interview</h2>
-        <div className="interviews-section">
-          {hasUpcomingInterviews ? (
-            latestInterviews?.map((interview) => (
-              <InterviewCard {...interview} key={interview.id} />
-            ))
-          ) : (
-            <p>There are no new interviews available</p>
-          )}
-        </div>
-      </section>
-    </>
-  );
+  // return (
+  //   <>
+  //     <section className="flex flex-col gap-6">
+  //       <h2>Your Interviews</h2>
+  //       <div className="interviews-section">
+  //         {hasPastInterviews ? (
+  //           userInterviews?.map((interview) => (
+  //             <InterviewCard {...interview} key={interview.id} />
+  //           ))
+  //         ) : (
+  //           <p>You haven&apos;t taken any interviews yet</p>
+  //         )}
+  //       </div>
+  //     </section>
+
+  //     <section className="flex flex-col gap-6 mt-8">
+  //       <h2>Take an Interview</h2>
+  //       <div className="interviews-section">
+  //         {hasUpcomingInterviews ? (
+  //           latestInterviews?.map((interview) => (
+  //             <InterviewCard {...interview} key={interview.id} />
+  //           ))
+  //         ) : (
+  //           <p>There are no new interviews available</p>
+  //         )}
+  //       </div>
+  //     </section>
+  //   </>
+  // );
 };
 
 export default Page;

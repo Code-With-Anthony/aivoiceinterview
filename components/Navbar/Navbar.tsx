@@ -1,7 +1,6 @@
 "use client";
 import {
   Home,
-  Mic,
   Code2,
   Sliders,
   Building2,
@@ -16,6 +15,8 @@ import {
   DollarSign,
   PenSquare,
   Menu,
+  AudioLines,
+  LayoutList,
 } from "lucide-react";
 
 import {
@@ -85,7 +86,7 @@ const Navbar = ({
   menu = [
     {
       title: "Home",
-      url: "/",
+      url: "/dashboard",
       icon: <Home className="size-5 shrink-0" />,
     },
     {
@@ -93,9 +94,15 @@ const Navbar = ({
       url: "/interview/all",
       items: [
         {
+          title: "All Interviews",
+          description: "Collections of different bunch of interviews.",
+          icon: <LayoutList className="size-5 shrink-0" />,
+          url: "/interview/all",
+        },
+        {
           title: "AI Voice Interview",
           description: "Simulate real-world voice-based interview scenarios.",
-          icon: <Mic className="size-5 shrink-0" />,
+          icon: <AudioLines className="size-5 shrink-0" />,
           url: "#",
         },
         {
@@ -227,7 +234,7 @@ const Navbar = ({
             <div className="flex items-center">
               <NavigationMenu>
                 <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
+                  {menu.map((item) => renderMenuItem(item, handleSheetClick))}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
@@ -318,7 +325,7 @@ const Navbar = ({
   );
 };
 
-const renderMenuItem = (item: MenuItem) => {
+const renderMenuItem = (item: MenuItem, handleSheetClick: any) => {
   if (item.items) {
     return (
       <NavigationMenuItem key={item.title}>
@@ -326,7 +333,7 @@ const renderMenuItem = (item: MenuItem) => {
         <NavigationMenuContent className="bg-popover text-popover-foreground">
           {item.items.map((subItem) => (
             <NavigationMenuLink asChild key={subItem.title} className=" !w-80">
-              <SubMenuLink item={subItem} />
+              <SubMenuLink item={subItem} handleSheetKey={handleSheetClick} />
             </NavigationMenuLink>
           ))}
         </NavigationMenuContent>
