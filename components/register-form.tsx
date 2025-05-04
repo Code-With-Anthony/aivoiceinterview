@@ -89,7 +89,7 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
       toast.success("Account created and signed in!");
 
       if (role === "candidate") {
-        router.push("/");
+        router.push("/dashboard");
       } else if (role === "recruiter") {
         router.push("/recruiter");
       }

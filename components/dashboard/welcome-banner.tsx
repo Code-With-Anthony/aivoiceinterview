@@ -5,16 +5,14 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CalendarDays } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useUserStore } from "@/lib/store/useUserStore";
 
 interface WelcomeBannerProps {
-  name: string;
   lastActive: string;
 }
 
-export default function WelcomeBanner({
-  name,
-  lastActive,
-}: WelcomeBannerProps) {
+export default function WelcomeBanner({ lastActive }: WelcomeBannerProps) {
+  const { user } = useUserStore((state) => state);
   const [greeting, setGreeting] = useState("Good day");
   const [motivationalMessage, setMotivationalMessage] = useState("");
 
@@ -48,7 +46,7 @@ export default function WelcomeBanner({
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl font-bold">
-              {greeting}, {name}!
+              {greeting}, {user?.name}!
             </h1>
             <p className="text-muted-foreground mt-1">{motivationalMessage}</p>
             <div className="flex items-center text-xs text-muted-foreground mt-2">

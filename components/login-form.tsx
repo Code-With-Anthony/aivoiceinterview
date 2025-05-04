@@ -78,7 +78,7 @@ export function LoginForm({
       form.reset();
 
       if (signInResult?.user?.role === "candidate") {
-        router.push("/");
+        router.push("/dashboard");
       } else if (signInResult?.user?.role === "recruiter") {
         router.push("/recruiter");
       }

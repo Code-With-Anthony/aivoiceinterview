@@ -249,7 +249,7 @@ const Navbar = ({
               <Button asChild variant="outline" size="sm">
                 <Link href={auth.login.url}>{auth.login.title}</Link>
               </Button>
-              <Button asChild variant="default" size="sm">
+              <Button variant="default" size="sm">
                 <Link href={auth.signup.url}>{auth.signup.title}</Link>
               </Button>
             </div>
