@@ -1,13 +1,13 @@
+import { RegisterForm } from "@/components/register-form";
 import { GalleryVerticalEnd } from "lucide-react";
 import Link from "next/link";
-import { RegisterForm } from "@/components/register-form";
-import { LampDemo } from "@/components/ui/lamp";
+import { AuthRightSideContent } from "../_utils/AuthRightSideContent";
 
 export default function RegisterPage() {
   return (
-    <div className="grid min-h-svh lg:grid-cols-2">
+    <div className="grid min-h-svh lg:grid-cols-2 dark:bg-black">
       <div className="flex flex-col gap-4 p-6 md:p-10">
-        <div className="flex justify-center gap-2 md:justify-start">
+        <div className="flex justify-center gap-2 md:justify-start items-center">
           <Link href="/" className="flex items-center gap-2 font-medium">
             <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
               <GalleryVerticalEnd className="size-4" />
@@ -21,8 +21,8 @@ export default function RegisterPage() {
           </div>
         </div>
       </div>
-      <div className="bg-muted relative hidden lg:block">
-        <LampDemo />
+      <div className="relative hidden lg:block">
+        <AuthRightSideContent page="signup" />
       </div>
     </div>
   );

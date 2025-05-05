@@ -124,7 +124,7 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
         <div className="flex flex-col items-center gap-2 text-center">
           <h1 className="text-2xl font-bold">Create New Account</h1>
           <p className="text-muted-foreground text-sm text-balance">
-            Enter your email below to login to your account
+            Register seamlessly with just a few simple steps.
           </p>
         </div>
         <div className="grid gap-6">
