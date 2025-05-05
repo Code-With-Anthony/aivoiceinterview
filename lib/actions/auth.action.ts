@@ -2,6 +2,7 @@
 
 import { auth, db } from "@/firebase/admin";
 import { auth as clientAuth } from "@/firebase/client"
+import { UserProfile } from "@/types/profile";
 import { getAuth } from "firebase-admin/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { cookies } from "next/headers";
@@ -42,12 +43,46 @@ export async function signUp(params: SignUpParams) {
             password as string
         );
 
-        await db.collection("users").doc(newUser.user.uid).set({
+        const userProfile: UserProfile = {
             name,
             email,
             role,
             authProvider,
-        });
+            bio: "",
+            personalDetails: {
+                age: null,
+                gender: "",
+                address: {
+                    street: "",
+                    city: "",
+                    state: "",
+                    pin: "",
+                },
+                image: "",
+                hobbies: [],
+            },
+            professionalDetails: {
+                totalExperience: "",
+                currentRole: [], // array of { designation, companyName, fromYear, toYear }
+                education: [], // array of { institution, degree, fieldOfStudy, fromYear, toYear }
+            },
+            experience: [], // array of { company, position, fromYear, toYear }
+            skills: [],
+            trainings: [],
+            certifications: [], // array of { name, date, url }
+            projects: [], // array of { name, description, url }
+            socialMedia: {
+                linkedIn: "",
+                dribbble: "",
+                hackerRank: "",
+                codeForces: "",
+                hackerEarth: "",
+                github: "",
+                stackoverflow: "",
+            },
+        };
+
+        await db.collection("users").doc(newUser.user.uid).set(userProfile);
 
         return {
             success: true,

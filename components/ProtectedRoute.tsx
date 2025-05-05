@@ -22,9 +22,15 @@ const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
 
     const isRecruiter = user.role === "recruiter";
     const isCandidate = user.role === "candidate";
+    const isVisitor = user?.role !== "recruiter" && user?.role !== "candidate";
 
-    if (!allowedRoles.includes(user.role)) {
-      router.push("/unauthorized");
+    if (isVisitor) {
+      router.push("/");
+      return;
+    }
+
+    if (!allowedRoles.includes(user.role as "candidate" | "recruiter")) {
+      router.push("/page-not-found");
       return;
     }
 
@@ -41,7 +47,8 @@ const ProtectedRoute = ({ allowedRoles, children }: ProtectedRouteProps) => {
     }
   }, [user, router, allowedRoles, pathname]);
 
-  if (!user || !allowedRoles.includes(user.role)) return null;
+  if (!user || !allowedRoles.includes(user.role as "candidate" | "recruiter"))
+    return null;
 
   return <>{children}</>;
 };

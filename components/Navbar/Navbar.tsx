@@ -86,7 +86,7 @@ const Navbar = ({
   menu = [
     {
       title: "Home",
-      url: "/dashboard",
+      url: "/",
       icon: <Home className="size-5 shrink-0" />,
     },
     {
@@ -213,7 +213,7 @@ const Navbar = ({
     setIsSheetOpen(false);
   };
   return (
-    <section className="py-4">
+    <section className="py-4 px-4 md:px-6 xl:px-10">
       <div className="container">
         {/* Desktop Menu */}
         <nav className="hidden justify-between lg:flex">

@@ -54,84 +54,82 @@ export default function InterviewFilters() {
   };
 
   const FiltersContent = () => (
-    <>
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="type">Interview Type</Label>
-          <Select onValueChange={(value) => addFilter(`Type: ${value}`)}>
-            <SelectTrigger id="type">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="technical">Technical</SelectItem>
-              <SelectItem value="behavioral">Behavioral</SelectItem>
-              <SelectItem value="mixed">Mixed</SelectItem>
-              <SelectItem value="coding">Coding</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="level">Difficulty Level</Label>
-          <Select onValueChange={(value) => addFilter(`Level: ${value}`)}>
-            <SelectTrigger id="level">
-              <SelectValue placeholder="Select level" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="easy">Easy</SelectItem>
-              <SelectItem value="medium">Medium</SelectItem>
-              <SelectItem value="hard">Hard</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="stack">Tech Stack</Label>
-          <Select onValueChange={(value) => addFilter(`Stack: ${value}`)}>
-            <SelectTrigger id="stack">
-              <SelectValue placeholder="Select stack" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="mern">MERN Stack</SelectItem>
-              <SelectItem value="mean">MEAN Stack</SelectItem>
-              <SelectItem value="javascript">JavaScript</SelectItem>
-              <SelectItem value="python">Python</SelectItem>
-              <SelectItem value="java">Java</SelectItem>
-              <SelectItem value="dotnet">.NET</SelectItem>
-              <SelectItem value="devops">DevOps</SelectItem>
-              <SelectItem value="project-management">
-                Project Management
-              </SelectItem>
-              <SelectItem value="hr">HR</SelectItem>
-              <SelectItem value="sales">Sales</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div className="space-y-4">
-          <div className="flex justify-between">
-            <Label>Duration (minutes)</Label>
-            <span className="text-sm text-muted-foreground">30-120</span>
-          </div>
-          <Slider defaultValue={[30, 120]} min={15} max={180} step={15} />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="status">Status</Label>
-          <Select onValueChange={(value) => addFilter(`Status: ${value}`)}>
-            <SelectTrigger id="status">
-              <SelectValue placeholder="Select status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="available">Available</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-              <SelectItem value="upcoming">Upcoming</SelectItem>
-              <SelectItem value="limited">Limited Time</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+    <div className="w-full flex justify-evenly gap-2 flex-wrap">
+      <div className="space-y-2">
+        <Label htmlFor="type">Interview Type</Label>
+        <Select onValueChange={(value) => addFilter(`Type: ${value}`)}>
+          <SelectTrigger id="type">
+            <SelectValue placeholder="Select type" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="technical">Technical</SelectItem>
+            <SelectItem value="behavioral">Behavioral</SelectItem>
+            <SelectItem value="mixed">Mixed</SelectItem>
+            <SelectItem value="coding">Coding</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
-    </>
+
+      <div className="space-y-2">
+        <Label htmlFor="level">Difficulty Level</Label>
+        <Select onValueChange={(value) => addFilter(`Level: ${value}`)}>
+          <SelectTrigger id="level">
+            <SelectValue placeholder="Select level" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="easy">Easy</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="hard">Hard</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="stack">Tech Stack</Label>
+        <Select onValueChange={(value) => addFilter(`Stack: ${value}`)}>
+          <SelectTrigger id="stack">
+            <SelectValue placeholder="Select stack" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="mern">MERN Stack</SelectItem>
+            <SelectItem value="mean">MEAN Stack</SelectItem>
+            <SelectItem value="javascript">JavaScript</SelectItem>
+            <SelectItem value="python">Python</SelectItem>
+            <SelectItem value="java">Java</SelectItem>
+            <SelectItem value="dotnet">.NET</SelectItem>
+            <SelectItem value="devops">DevOps</SelectItem>
+            <SelectItem value="project-management">
+              Project Management
+            </SelectItem>
+            <SelectItem value="hr">HR</SelectItem>
+            <SelectItem value="sales">Sales</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex justify-between">
+          <Label>Duration (minutes)</Label>
+        </div>
+        <Slider defaultValue={[30, 120]} min={15} max={180} step={15} />
+        <span className="text-sm text-muted-foreground">30-120</span>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="status">Status</Label>
+        <Select onValueChange={(value) => addFilter(`Status: ${value}`)}>
+          <SelectTrigger id="status">
+            <SelectValue placeholder="Select status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="available">Available</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+            <SelectItem value="upcoming">Upcoming</SelectItem>
+            <SelectItem value="limited">Limited Time</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+    </div>
   );
 
   return (
@@ -147,7 +145,7 @@ export default function InterviewFilters() {
           />
         </div>
 
-        {isMobile ? (
+        {isMobile && (
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon">
@@ -176,17 +174,13 @@ export default function InterviewFilters() {
               </SheetFooter>
             </SheetContent>
           </Sheet>
-        ) : (
-          <Button variant="outline" size="icon">
-            <SlidersHorizontal className="h-4 w-4" />
-          </Button>
         )}
 
         <Button type="submit">Search</Button>
       </form>
 
       {!isMobile && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 p-6 border rounded-lg bg-muted/40">
+        <div className="hidden md:flex w-full">
           <FiltersContent />
         </div>
       )}

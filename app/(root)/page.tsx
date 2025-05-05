@@ -14,21 +14,18 @@ import { redirect } from "next/navigation";
 const Page = async () => {
   const user = await getCurrentUser();
 
-  if (!user) {
-    return (
-      <>
-        <HeroSection />
-        <FeaturesSection />
-        <HowItWorksSection />
-        <PricingSection />
-        <FAQSection />
-      </>
-    );
-  }
-
   if (user?.role === "recruiter") redirect("/recruiter/dashboard");
 
   if (user?.role === "candidate") redirect("/dashboard");
+  return (
+    <>
+      <HeroSection />
+      <FeaturesSection />
+      <HowItWorksSection />
+      <PricingSection />
+      <FAQSection />
+    </>
+  );
 
   // const [userInterviews, latestInterviews] = await Promise.all([
   //   getInterviewsByUserId(user.id),

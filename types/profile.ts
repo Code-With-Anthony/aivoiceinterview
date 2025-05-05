@@ -4,6 +4,7 @@ export interface UserProfile {
     bio?: string
     email?: string
     role?: string
+    authProvider?: string;
     personalDetails?: PersonalDetails
     professionalDetails?: ProfessionalDetails
     experience?: Experience[]
@@ -15,7 +16,7 @@ export interface UserProfile {
 }
 
 export interface PersonalDetails {
-    age?: string
+    age?: string | null
     gender?: string
     address?: {
         street?: string
@@ -68,7 +69,7 @@ export interface Project {
 }
 
 export interface SocialMedia {
-    linkedin?: string
+    linkedIn?: string
     dribbble?: string
     hackerRank?: string
     codeForces?: string
