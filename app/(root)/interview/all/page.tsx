@@ -87,6 +87,7 @@ import { getInterviews } from "@/lib/data";
 import InterviewFilters from "./_components/interview-filter";
 import InterviewListSkeleton from "./_components/interview-list-skelaton";
 import InterviewList from "./_components/interview-list";
+import InterviewPagination from "./_components/interviewPagination";
 
 export const metadata: Metadata = {
   title: "Interviews | AI Voice Interview Platform",
@@ -104,7 +105,7 @@ export default async function InterviewsPage({
 
   return (
     <div className="container mx-auto py-8 px-4">
-      <div className="mb-8">
+      <div className="mb-4">
         <h1 className="text-3xl font-bold mb-2">Available Interviews</h1>
         <p className="text-muted-foreground">
           Browse through our collection of AI-powered interviews from top
@@ -117,6 +118,8 @@ export default async function InterviewsPage({
       <Suspense fallback={<InterviewListSkeleton />}>
         <InterviewList interviews={interviews} />
       </Suspense>
+
+      <InterviewPagination />
     </div>
   );
 }

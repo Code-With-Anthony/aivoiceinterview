@@ -31,7 +31,6 @@ export default function SkillsForm({
   useEffect(() => {
     setSelectedFrameworks(selectedFrameworks);
     updateFormData({ skills: selectedFrameworks });
-    console.log("called called");
   }, [selectedFrameworks]);
 
   return (

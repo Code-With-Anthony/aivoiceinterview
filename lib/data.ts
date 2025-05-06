@@ -1,11 +1,17 @@
 import type { Interview } from "@/types/profile"
 
+export function getBrandLogo(domain: string, theme: string) {
+    const clientId = process.env.NEXT_PUBLIC_BRANDFETCH_CLIENT_ID!;
+    return `https://cdn.brandfetch.io/${domain}/${theme}/w/200/h/200?c=${clientId}`;
+}
+
+
 // Mock data for demonstration purposes
 const interviews: Interview[] = [
     {
         id: "1",
-        companyName: "TechCorp",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=TC",
+        companyName: "Apple",
+        companyLogo: "apple.com",
         name: "MERN Stack Developer",
         type: "Technical",
         level: "Medium",
@@ -21,8 +27,8 @@ const interviews: Interview[] = [
     },
     {
         id: "2",
-        companyName: "InnovateSoft",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=IS",
+        companyName: "Google",
+        companyLogo: "google.com",
         name: "Frontend Developer",
         type: "Mixed",
         level: "Easy",
@@ -38,8 +44,8 @@ const interviews: Interview[] = [
     },
     {
         id: "3",
-        companyName: "DataDynamics",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=DD",
+        companyName: "Microsoft",
+        companyLogo: "microsoft.com",
         name: "Backend Engineer",
         type: "Technical",
         level: "Hard",
@@ -55,8 +61,8 @@ const interviews: Interview[] = [
     },
     {
         id: "4",
-        companyName: "CloudNative",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=CN",
+        companyName: "Tesla",
+        companyLogo: "tesla.com",
         name: "DevOps Engineer",
         type: "Technical",
         level: "Medium",
@@ -72,8 +78,8 @@ const interviews: Interview[] = [
     },
     {
         id: "5",
-        companyName: "AgileTeam",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=AT",
+        companyName: "TikTok",
+        companyLogo: "tiktok.com",
         name: "Project Manager",
         type: "Behavioral",
         level: "Medium",
@@ -89,8 +95,8 @@ const interviews: Interview[] = [
     },
     {
         id: "6",
-        companyName: "TalentHub",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=TH",
+        companyName: "Bloomberg",
+        companyLogo: "bloomberg.com",
         name: "HR Specialist",
         type: "Behavioral",
         level: "Easy",
@@ -106,8 +112,8 @@ const interviews: Interview[] = [
     },
     {
         id: "7",
-        companyName: "CodeMasters",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=CM",
+        companyName: "Figma.com",
+        companyLogo: "figma.com",
         name: "Full Stack JavaScript",
         type: "Technical",
         level: "Medium",
@@ -123,8 +129,8 @@ const interviews: Interview[] = [
     },
     {
         id: "8",
-        companyName: "DataInsights",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=DI",
+        companyName: "Dribbble",
+        companyLogo: "dribbble.com",
         name: "Data Scientist",
         type: "Technical",
         level: "Hard",
@@ -140,8 +146,8 @@ const interviews: Interview[] = [
     },
     {
         id: "9",
-        companyName: "SalesPro",
-        companyLogo: "/placeholder.svg?height=40&width=40&text=SP",
+        companyName: "Linear",
+        companyLogo: "linear.app",
         name: "Sales Representative",
         type: "Behavioral",
         level: "Medium",

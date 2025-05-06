@@ -5,7 +5,7 @@ const RootLayout = async ({ children }: { children: ReactNode }) => {
   return (
     <div>
       <Navbar />
-      <div>{children}</div>
+      <div className="px-8">{children}</div>
     </div>
   );
 };

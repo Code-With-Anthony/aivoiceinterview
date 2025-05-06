@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
@@ -13,12 +15,22 @@ import {
 import { CalendarDays, Clock, ExternalLink, Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Interview } from "@/types/profile";
-
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useEffect, useState } from "react";
+import { getBrandLogo } from "@/lib/data";
+import { useTheme } from "next-themes";
 interface InterviewCardProps {
   interview: Interview;
 }
 
 export default function InterviewCard({ interview }: InterviewCardProps) {
+  // Track window size using useState and useEffect
+  const [windowWidth, setWindowWidth] = useState(0);
+
+  const maxBadgesSm = 2; // For small screens (sm)
+  const maxBadgesMd = 2; // For medium screens (md)
+  const maxBadgesLg = 3; // For large screens (lg)
+
   const {
     id,
     companyName,
@@ -57,21 +69,50 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
     return date.value;
   };
 
+  // Update window width on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    // Set initial window width
+    handleResize();
+
+    // Add resize event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup listener on component unmount
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  // Determine number of badges to display based on screen size
+  const displayedTechs =
+    windowWidth <= 640
+      ? techStack.slice(0, maxBadgesSm) // For small screens (mobile)
+      : windowWidth <= 1024
+      ? techStack.slice(0, maxBadgesMd) // For medium screens (tablets/laptops)
+      : techStack.slice(0, maxBadgesLg); // For large screens (desktops)
+
+  // Calculate remaining count based on the visible number of badges
+  const remainingCount = techStack.length - displayedTechs.length;
+  const theme = useTheme();
+
   return (
     <Card className="h-full flex flex-col transition-all hover:shadow-md">
       <CardHeader className="pb-4">
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="relative h-10 w-10 overflow-hidden rounded-md">
-              <Image
-                src={companyLogo || "/placeholder.svg?height=40&width=40"}
+              <img
+                src={getBrandLogo(companyLogo, theme.theme)}
                 alt={companyName}
-                fill
                 className="object-cover"
               />
             </div>
             <div>
-              <p className="text-sm font-medium">{companyName}</p>
+              <p className="text-md font-semibold">{companyName}</p>
               <p className="text-xs text-muted-foreground">{type}</p>
             </div>
           </div>
@@ -79,18 +120,30 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
             {level}
           </Badge>
         </div>
-        <CardTitle className="text-xl mt-2">{name}</CardTitle>
-        <CardDescription className="line-clamp-2">
+        <CardTitle className="text-lg mt-2">{name}</CardTitle>
+        <CardDescription className="line-clamp-3">
           {description}
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4 flex-grow">
         <div className="flex flex-wrap gap-1 mb-4">
-          {techStack.map((tech) => (
-            <Badge key={tech} variant="outline" className="font-normal">
-              {tech}
-            </Badge>
-          ))}
+          {/* Display tech stack */}
+          <div className="flex gap-1">
+            {displayedTechs.map((tech) => (
+              <Badge key={tech} variant="outline" className="font-normal">
+                {tech}
+              </Badge>
+            ))}
+          </div>
+
+          {/* Display the remaining count in a circle */}
+          {remainingCount > 0 && (
+            <Avatar className="w-8 h-8 rounded-full flex items-center justify-center">
+              <AvatarFallback className="text-sm">
+                +{remainingCount}
+              </AvatarFallback>
+            </Avatar>
+          )}
         </div>
         <div className="grid grid-cols-2 gap-y-2 text-sm">
           <div className="flex items-center gap-1 text-muted-foreground">
@@ -109,19 +162,21 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
           </div>
         </div>
       </CardContent>
-      <CardFooter className="flex flex-col gap-2 pt-0">
+      <CardFooter className="flex flex-col md:flex-row gap-2 pt-0 px-4">
         <Link href={`/interview/${id}`} className="w-full">
-          <Button variant="outline" className="w-full justify-between">
+          <Button variant="outline" className="w-full cursor-pointer">
             View Details
             <ExternalLink className="h-4 w-4" />
           </Button>
         </Link>
-        <Button
-          className="w-full"
-          variant={completed ? "secondary" : "default"}
-        >
-          {completed ? "View Results" : "Take Interview"}
-        </Button>
+        <Link href={`/interview/${id}`} className="w-full">
+          <Button
+            className="w-full cursor-pointer"
+            variant={completed ? "secondary" : "default"}
+          >
+            {completed ? "View Results" : "Take Interview"}
+          </Button>
+        </Link>
       </CardFooter>
     </Card>
   );

@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    domains: ["github.com"], // Add this line
+    domains: ["github.com", "cdn.brandfetch.io"],
   },
 };
 
