@@ -12,7 +12,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { CalendarDays, Clock, ExternalLink, Star } from "lucide-react";
+import {
+  AudioLines,
+  CalendarDays,
+  Clock,
+  Code,
+  ExternalLink,
+  Star,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Interview } from "@/types/profile";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -43,6 +50,7 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
     description,
     techStack,
     completed,
+    coding,
   } = interview;
 
   const getDifficultyColor = (level: string) => {
@@ -60,11 +68,11 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
 
   const getDateDisplay = () => {
     if (date.type === "permanent") {
-      return "Always available";
+      return "open";
     } else if (date.type === "future") {
-      return `Opens on ${date.value}`;
+      return `Live on ${date.value}`;
     } else if (date.type === "limited") {
-      return `Closes in ${date.value} days`;
+      return `Ends in ${date.value} days`;
     }
     return date.value;
   };
@@ -154,10 +162,20 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
             <CalendarDays className="h-3.5 w-3.5" />
             <span>{getDateDisplay()}</span>
           </div>
-          <div className="flex items-center gap-1 col-span-2">
+          <div className="flex items-center gap-1">
             <Star className="h-3.5 w-3.5 text-amber-500" />
             <span className="font-medium">
               {score !== null ? `${score}/100` : "Not attempted"}
+            </span>
+          </div>
+          <div className="flex items-center gap-1">
+            {coding === true ? (
+              <Code className="h-3.5 w-3.5" />
+            ) : (
+              <AudioLines className="h-3.5 w-3.5" />
+            )}
+            <span className="font-medium">
+              {coding === true ? "Coding" : "Voice"} Interview
             </span>
           </div>
         </div>

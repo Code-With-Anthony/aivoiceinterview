@@ -68,7 +68,7 @@ const FeaturesSection = () => {
             Powerful Features for{" "}
             <span className="gradient-text">Modern Recruiting</span>
           </h2>
-          <p className="text-lg text-gray-700">
+          <p className="text-lg">
             Our AI-powered platform streamlines your hiring process with these
             innovative features
           </p>
@@ -78,7 +78,7 @@ const FeaturesSection = () => {
           {features.map((feature, index) => (
             <div
               key={index}
-              className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 transition-all duration-300 hover:shadow-md hover:translate-y-[-5px]"
+              className="p-6 rounded-xl shadow-sm border transition-all duration-300 hover:shadow-md hover:translate-y-[-5px]"
             >
               <div className="mb-4">{feature.icon}</div>
               <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
@@ -117,7 +117,7 @@ const FeaturesSection = () => {
               </ul>
             </div>
             <div className="relative">
-              <div className="aspect-square max-w-md mx-auto bg-white rounded-2xl shadow-lg p-6 relative z-10">
+              <div className="aspect-square max-w-md mx-auto rounded-2xl shadow-lg p-6 relative z-10">
                 <div className="flex items-center mb-6">
                   <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
                     <div className="text-purple-600 font-bold">87%</div>
@@ -135,7 +135,7 @@ const FeaturesSection = () => {
                       <span>Traditional Process</span>
                       <span>40hrs/week</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-3 rounded-full">
+                    <div className="w-full h-3 rounded-full">
                       <div
                         className="bg-gray-400 h-3 rounded-full"
                         style={{ width: "100%" }}
@@ -147,7 +147,7 @@ const FeaturesSection = () => {
                       <span>With VoiceInterview</span>
                       <span>5.2hrs/week</span>
                     </div>
-                    <div className="w-full bg-gray-100 h-3 rounded-full">
+                    <div className="w-full h-3 rounded-full">
                       <div
                         className="bg-primary h-3 rounded-full"
                         style={{ width: "13%" }}

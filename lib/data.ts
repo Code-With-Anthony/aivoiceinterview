@@ -14,6 +14,7 @@ const interviews: Interview[] = [
         companyLogo: "apple.com",
         name: "MERN Stack Developer",
         type: "Technical",
+        coding: true,
         level: "Medium",
         score: null,
         date: {
@@ -48,6 +49,7 @@ const interviews: Interview[] = [
         companyLogo: "microsoft.com",
         name: "Backend Engineer",
         type: "Technical",
+        coding: true,
         level: "Hard",
         score: null,
         date: {
@@ -65,6 +67,7 @@ const interviews: Interview[] = [
         companyLogo: "tesla.com",
         name: "DevOps Engineer",
         type: "Technical",
+        coding: true,
         level: "Medium",
         score: null,
         date: {
@@ -116,6 +119,7 @@ const interviews: Interview[] = [
         companyLogo: "figma.com",
         name: "Full Stack JavaScript",
         type: "Technical",
+        coding: true,
         level: "Medium",
         score: 78,
         date: {
@@ -133,6 +137,7 @@ const interviews: Interview[] = [
         companyLogo: "dribbble.com",
         name: "Data Scientist",
         type: "Technical",
+        coding: true,
         level: "Hard",
         score: null,
         date: {

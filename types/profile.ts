@@ -84,6 +84,7 @@ export interface Interview {
     companyLogo?: string
     name: string
     type: string
+    coding?: boolean
     level: string
     score: number | null
     date: {

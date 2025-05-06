@@ -233,17 +233,19 @@ export default function InterviewFilters() {
             <PopoverContent className="absolute top-2 right-[-55px]">
               <h4 className="text-sm font-semibold mb-4">Filter Interviews</h4>
               <div className="space-y-4">
-                <div className="space-y-4">
-                  <div className="flex justify-between">
-                    <Label>Duration (minutes)</Label>
-                  </div>
-                  <Slider
-                    defaultValue={[30, 120]}
-                    min={15}
-                    max={180}
-                    step={15}
-                  />
-                  <span className="text-sm text-muted-foreground">30-120</span>
+                <div className="space-y-2 flex-1">
+                  <Label htmlFor="status">Type</Label>
+                  <Select
+                    onValueChange={(value) => addFilter(`Type: ${value}`)}
+                  >
+                    <SelectTrigger id="status" className="w-full">
+                      <SelectValue placeholder="Select type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="new">Voice</SelectItem>
+                      <SelectItem value="available">Coding</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
 
                 <div className="space-y-2 flex-1">
@@ -262,6 +264,20 @@ export default function InterviewFilters() {
                       <SelectItem value="limited">Limited Time</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between">
+                    <Label>Duration (minutes)</Label>
+                  </div>
+                  <Slider
+                    defaultValue={[30, 120]}
+                    min={15}
+                    max={180}
+                    step={15}
+                    className="mt-4"
+                  />
+                  <span className="text-sm text-muted-foreground">30-120</span>
                 </div>
 
                 {/* <FiltersContent /> */}
