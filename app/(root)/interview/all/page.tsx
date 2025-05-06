@@ -88,6 +88,7 @@ import InterviewFilters from "./_components/interview-filter";
 import InterviewListSkeleton from "./_components/interview-list-skelaton";
 import InterviewList from "./_components/interview-list";
 import InterviewPagination from "./_components/interviewPagination";
+import InterviewFiltersSkeleton from "./_components/interview-filter-skeleton";
 
 export const metadata: Metadata = {
   title: "Interviews | AI Voice Interview Platform",
@@ -113,7 +114,9 @@ export default async function InterviewsPage({
         </p>
       </div>
 
-      <InterviewFilters />
+      <Suspense fallback={<InterviewFiltersSkeleton />}>
+        <InterviewFilters />
+      </Suspense>
 
       <Suspense fallback={<InterviewListSkeleton />}>
         <InterviewList interviews={interviews} />
