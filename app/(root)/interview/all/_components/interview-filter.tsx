@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/sheet";
 import { useMobile } from "@/hooks/interview-use-mobile";
 import { Search, SlidersHorizontal, Sparkles, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PlaceholdersAndVanishInput } from "@/components/ui/placeholders-and-vanish-input";
 import {
   Popover,
@@ -31,10 +31,12 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
-import { redirect } from "next/navigation";
+import { redirect, useSearchParams } from "next/navigation";
 
 export default function InterviewFilters() {
   const isMobile = useMobile();
+  const searchParams = useSearchParams();
+  const initialType = searchParams.get("type");
 
   // const [search, setSearch] = useState("");
   const [activeFilters, setActiveFilters] = useState<string[]>([]);
@@ -174,6 +176,13 @@ export default function InterviewFilters() {
     e.preventDefault();
     console.log("submitted");
   };
+
+  // On mount, apply initial type filter from query param
+  useEffect(() => {
+    if (initialType && !activeFilters.includes(`Type: ${initialType}`)) {
+      setActiveFilters((prev) => [...prev, `Type: ${initialType}`]);
+    }
+  }, [initialType]);
 
   return (
     <div className="mb-8 space-y-4">

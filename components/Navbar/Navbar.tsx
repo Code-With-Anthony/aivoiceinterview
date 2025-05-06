@@ -103,13 +103,13 @@ const Navbar = ({
           title: "AI Voice Interview",
           description: "Simulate real-world voice-based interview scenarios.",
           icon: <AudioLines className="size-5 shrink-0" />,
-          url: "#",
+          url: "/interview/all?type=voice",
         },
         {
           title: "AI Coding Interview",
           description: "Practice coding questions in a realistic environment.",
           icon: <Code2 className="size-5 shrink-0" />,
-          url: "#",
+          url: "/interview/all?type=coding",
         },
         {
           title: "Custom Interview",
