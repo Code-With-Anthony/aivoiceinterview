@@ -104,7 +104,7 @@ export default async function InterviewDetailsPage({
 }: {
   params: { id: string };
 }) {
-  const interview = await getInterviewById(params.id);
+  const interview = await getInterviewById(params?.id);
 
   if (!interview) {
     notFound();
@@ -154,13 +154,12 @@ export default async function InterviewDetailsPage({
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <div className="relative h-16 w-16 overflow-hidden rounded-md">
-                <Image
+                <img
                   src={
                     interview.companyLogo ||
                     "/placeholder.svg?height=64&width=64"
                   }
                   alt={interview.companyName}
-                  fill
                   className="object-cover"
                 />
               </div>

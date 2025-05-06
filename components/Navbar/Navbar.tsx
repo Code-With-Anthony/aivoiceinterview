@@ -192,6 +192,11 @@ const Navbar = ({
       ],
     },
     {
+      title: "Jobs",
+      url: "/jobs",
+      icon: <Briefcase className="size-5 shrink-0" />,
+    },
+    {
       title: "Pricing",
       url: "/pricing",
       icon: <DollarSign className="size-5 shrink-0" />,

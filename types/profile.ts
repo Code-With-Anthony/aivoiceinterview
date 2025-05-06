@@ -95,3 +95,73 @@ export interface Interview {
     techStack: string[]
     completed: boolean
 }
+
+export interface Company {
+    id: string
+    name: string
+    logo: string
+    coverImage?: string
+    industry: string
+    headquarters: string
+    size: string
+    foundedYear: string
+    website: string
+    description: string
+    mission: string
+    values?: string[]
+    products?: {
+        name: string
+        description: string
+    }[]
+    techStack?: {
+        frontend?: string[]
+        backend?: string[]
+        database?: string[]
+        devops?: string[]
+        other?: string[]
+    }
+    reviews?: {
+        id: string
+        author: string
+        avatar?: string
+        position: string
+        date: string
+        title: string
+        content: string
+        pros?: string
+        cons?: string
+        ratings: {
+            workLifeBalance: number
+            culture: number
+            careerGrowth: number
+            diversity: number
+        }
+    }[]
+    social?: {
+        linkedin?: string
+        twitter?: string
+        github?: string
+        glassdoor?: string | null;
+    }
+    verified?: boolean
+}
+
+export interface Job {
+    id: string
+    companyId: string
+    companyName: string
+    companyLogo?: string
+    title: string
+    type: string
+    level: string
+    location: string
+    isRemote: boolean
+    salary?: string
+    postedDate: string
+    description: string
+    requirements?: string[]
+    skills?: string[]
+    relatedInterviewId: string
+    relatedInterviewTitle: string
+    applyUrl: string
+}
