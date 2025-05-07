@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { AUTH_BUTTON_TITLES } from "@/constants";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import AuthButton from "./AuthButton";
 import FormField from "./FormField";
 import PasswordField from "./PasswordField";
 import { Form } from "./ui/form";
@@ -51,12 +52,18 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      const { name, email, password, role } = values;
-
-      if (!name || !email || !password || !role) {
+      if (
+        !values ||
+        !values.name ||
+        !values.email ||
+        !values.password ||
+        !values.role
+      ) {
         toast.error("Please fill all the field");
         return;
       }
+
+      const { name, email, password, role } = values;
 
       const result = await signUp({
         name: name as string,
@@ -160,9 +167,8 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
               {(field, fieldState) => (
                 <Select onValueChange={field.onChange} value={field.value}>
                   <SelectTrigger
-                    className={`w-full ${
-                      fieldState.error ? "border-red-500" : ""
-                    }`}
+                    className={`w-full ${fieldState.error ? "border-red-500" : ""
+                      }`}
                   >
                     <SelectValue placeholder="Select your role" />
                   </SelectTrigger>
@@ -174,13 +180,13 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
               )}
             </FormField>
           </div>
-          <Button type="submit" className="w-full">
-            {form.formState.isSubmitting ? (
-              <span className="loading-spinner">Please wait..</span>
-            ) : (
-              "Register"
-            )}
-          </Button>
+          <AuthButton
+            title={AUTH_BUTTON_TITLES.REGISTER}
+            onClick={onSubmit} // Pass form submit handler to onClick
+            loadingText="Registering...."
+            variant="default"
+            disabled={!form.formState.isValid}
+          />
         </div>
         <div className="text-center text-sm">
           Already have an account?{" "}

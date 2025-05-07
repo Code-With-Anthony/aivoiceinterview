@@ -1,13 +1,19 @@
 "use client";
+import {
+  AuthProvider,
+  GOOGLEERROR_MESSAGE,
+  ROLE,
+  SUCCESS_MESSAGE,
+} from "@/constants";
+import { auth, provider } from "@/firebase/client";
+import { getCurrentUser, signIn } from "@/lib/actions/auth.action";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { signInWithPopup } from "firebase/auth";
-import { auth, provider } from "@/firebase/client";
-import { toast } from "sonner";
-import { getCurrentUser, signIn } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export const useGoogleAuth = () => {
-  const { setUser } = useUserStore(state => state);
+  const { setUser } = useUserStore((state) => state);
   const router = useRouter();
 
   const handleGoogleAuth = async () => {
@@ -16,7 +22,7 @@ export const useGoogleAuth = () => {
       const user = result.user;
 
       if (!user) {
-        toast.error("Google sign-in failed: No user data");
+        toast.error(GOOGLEERROR_MESSAGE.GOOGLE_SIGNIN_FAILED_NO_USER);
         return;
       }
 
@@ -27,7 +33,7 @@ export const useGoogleAuth = () => {
       const signInResult = await signIn({
         email: user.email!,
         idToken,
-        authProvider: "google"
+        authProvider: AuthProvider.GOOGLE,
       });
 
       if (signInResult?.success === true) {
@@ -36,22 +42,27 @@ export const useGoogleAuth = () => {
           name: signInResult?.user?.name,
           email: signInResult?.user?.email,
           role: signInResult?.user?.role,
-          authProvider: "google",
+          authProvider: AuthProvider.GOOGLE,
         });
-        toast.success("Signed in successfully!");
+        toast.success(SUCCESS_MESSAGE.SIGNIN_SUCCESSFULL);
+      } else if (
+        signInResult.message === GOOGLEERROR_MESSAGE.GOOGLE_POPUP_CLOSED_BY_USER
+      ) {
+        toast.error(GOOGLEERROR_MESSAGE.GOOGLE_SIGNIN_FAILED_BY_CLOSING_POPUP);
+        return;
       } else {
         toast.error(signInResult.message);
         return;
       }
 
-      if (userDetails?.role === "candidate") {
-        router.push("/candidate");
-      } else if (userDetails?.role === "recruiter") {
+      if (userDetails?.role === ROLE.CANDIDATE) {
+        router.push("/");
+      } else if (userDetails?.role === ROLE.RECRUITER) {
         router.push("/recruiter");
       }
     } catch (error) {
       console.error("Google Auth Error:", error);
-      toast.error("Google sign-in failed");
+      toast.error(GOOGLEERROR_MESSAGE.GOOGLE_SIGNIN_FAILED);
     }
   };
 

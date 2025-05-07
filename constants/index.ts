@@ -228,3 +228,73 @@ export const dummyInterviews: Interview[] = [
     createdAt: "2024-03-14T15:30:00Z",
   },
 ];
+
+export const AUTH_BUTTON_TITLES = {
+  LOGIN: "Login",
+  SIGNUP: "Sign up",
+  REGISTER: "Register",
+  LOGOUT: "Logout",
+  LOGIN_WITH_GOOGLE: "Login with Google",
+};
+
+export const STRONG_PASSWORD_TEXT = "Your password is strong 💪";
+
+export const AuthProvider = {
+  GOOGLE: "google",
+  EMAIL: "email",
+};
+
+export const ROLE = {
+  CANDIDATE: "candidate",
+  RECRUITER: "recruiter",
+  ADMIN: "admin",
+};
+
+export const INVALID_PASSWORD = "Invalid Password";
+export const ID_TOKEN_ERROR_SIGNIN = "Error signing in. Please try again.";
+
+export const GOOGLEERROR_MESSAGE = {
+  GOOGLE_SIGNIN_FAILED_NO_USER: "Google sign-in failed: No user data",
+  GOOGLE_POPUP_CLOSED_BY_USER: "auth/popup-closed-by-user",
+  GOOGLE_SIGNIN_FAILED_BY_CLOSING_POPUP: "Sign in with Google Failed",
+  GOOGLE_SIGNIN_FAILED: "Google sign-in failed",
+};
+
+export const FIREBASE_ERROR = {
+  EMAIL_ALREAY_IN_USE: {
+    TITLE: "auth/email-already-in-use",
+    MESSAGE: "Email already in use. Please sign in.",
+  },
+  INVALID_CREDENTIALS: {
+    TITLE: "auth/invalid-credential",
+    MESSAGE: "Invalid Credentials",
+  },
+  TOO_MANY_ATTEMPTS: {
+    TITLE: "auth/too-many-requests",
+    MESSAGE:
+      "Too many failed attempts. Please wait a few minutes and try again.",
+  },
+};
+
+export const SUCCESS_MESSAGE = {
+  SIGNIN_SUCCESSFULL: "Signed in successfully!",
+};
+
+export const AUTH_BUTTON = {
+  LOGIN: "login",
+  SIGNUP: "Sign up",
+  LOGOUT: "logout",
+};
+
+export const PASSWORD_VALIDATIONS = {
+  HAS_MIN_LENGTH: "Use at least 8 characters.",
+  HAS_NUMBER: "Include at least one number (0-9).",
+  HAS_SPECIAL_CHARACTER:
+    "Include at least one special character (e.g. !, @, #).",
+  PASSWORD_STRENGTH: {
+    WEAK: "Weak",
+    FAIR: "Fair",
+    GOOD: "Good",
+    STRONG: "Strong",
+  },
+};

@@ -28,9 +28,12 @@ export const useUserStore = create<UserState>()(
         localStorage.removeItem("user-storage");
         localStorage.removeItem("token");
       },
-      
+
       hasHydrated: false,
       setHasHydrated: (hydrated) => set({ hasHydrated: hydrated }),
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true);
+      }
     }),
     {
       name: "user-storage", // localStorage key

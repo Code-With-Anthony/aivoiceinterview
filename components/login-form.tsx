@@ -1,8 +1,8 @@
 "use client";
 
 import { useGoogleAuth } from "@/app/(auth)/_utils/google-auth";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
+import { AUTH_BUTTON, AUTH_BUTTON_TITLES, AuthProvider, FIREBASE_ERROR, ID_TOKEN_ERROR_SIGNIN, INVALID_PASSWORD, ROLE, SUCCESS_MESSAGE } from "@/constants";
 import { auth } from "@/firebase/client";
 import { signIn } from "@/lib/actions/auth.action";
 import { useUserStore } from "@/lib/store/useUserStore";
@@ -13,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import AuthButton from "./AuthButton";
 import FormField from "./FormField";
 import PasswordField from "./PasswordField";
 import { Form } from "./ui/form";
@@ -20,7 +21,7 @@ import { Form } from "./ui/form";
 const getAuthFormSchema = () =>
   z.object({
     email: z.string().email(),
-    password: z.string().min(1, { message: "Invalid Password" }),
+    password: z.string().min(1, { message: INVALID_PASSWORD }),
   });
 
 export function LoginForm({
@@ -42,6 +43,10 @@ export function LoginForm({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      if (!values || !values.email || !values.password) {
+        return;
+      }
+
       const { email, password } = values;
 
       const userCredentials = await signInWithEmailAndPassword(
@@ -53,49 +58,48 @@ export function LoginForm({
       const idToken = await userCredentials.user.getIdToken();
 
       if (!idToken) {
-        toast.error("Error signing in. Please try again.");
+        toast.error(ID_TOKEN_ERROR_SIGNIN);
         return;
       }
 
       const signInResult = await signIn({
         email: email,
         idToken: idToken,
-        authProvider: "email",
+        authProvider: AuthProvider.EMAIL,
       });
 
       if (signInResult.success === true) {
-        toast.success("Signed in successfully!");
+        toast.success(SUCCESS_MESSAGE.SIGNIN_SUCCESSFULL);
         setUser({
           id: userCredentials.user.uid,
           name: signInResult.user?.name,
           email: userCredentials.user.email!,
           role: signInResult.user?.role,
-          authProvider: "email",
+          authProvider: AuthProvider.EMAIL,
         });
       }
 
       // Reset the form before redirection
       form.reset();
 
-      if (signInResult?.user?.role === "candidate") {
+      if (signInResult?.user?.role === ROLE.CANDIDATE) {
         router.push("/dashboard");
-      } else if (signInResult?.user?.role === "recruiter") {
+      } else if (signInResult?.user?.role === ROLE.RECRUITER) {
         router.push("/recruiter");
       }
     } catch (error: any) {
-      if (error?.code === "auth/email-already-in-use") {
-        toast.error("Email already in use. Please sign in.");
+      if (error?.code === FIREBASE_ERROR.EMAIL_ALREAY_IN_USE.TITLE) {
+        toast.error(FIREBASE_ERROR.EMAIL_ALREAY_IN_USE.MESSAGE);
         return;
       }
-      if (error?.code === "auth/invalid-credential") {
-        toast.error("Invalid Credentials");
+      if (error?.code === FIREBASE_ERROR.INVALID_CREDENTIALS.TITLE) {
+        toast.error(FIREBASE_ERROR.INVALID_CREDENTIALS.MESSAGE);
         return;
       }
 
-      if (error.code === "auth/too-many-requests") {
+      if (error.code === FIREBASE_ERROR.TOO_MANY_ATTEMPTS.TITLE) {
         toast.error(
-          "Too many failed attempts. Please wait a few minutes and try again."
-        );
+          FIREBASE_ERROR.TOO_MANY_ATTEMPTS.MESSAGE);
         return;
       }
 
@@ -145,34 +149,28 @@ export function LoginForm({
               signUp={false}
             />
           </div>
-          <Button type="submit" className="w-full">
-            {form.formState.isSubmitting ? (
-              <span className="loading-spinner">Please wait..</span>
-            ) : (
-              "Login"
-            )}
-          </Button>
+          <AuthButton
+            title={AUTH_BUTTON_TITLES.LOGIN}
+            onClick={onSubmit} // Pass form submit handler to onClick
+            loadingText="Logging in..."
+            variant="default"
+            disabled={!form.formState.isValid}
+          />
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">
               Or continue with
             </span>
           </div>
-          <Button
-            variant="outline"
-            className="w-full"
-            type="button"
+          <AuthButton
+            title={AUTH_BUTTON_TITLES.LOGIN_WITH_GOOGLE}
             onClick={handleGoogleAuth}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
-              <path d="M488 261.8C488 403.3 391.1 504 248 504 110.8 504 0 393.2 0 256S110.8 8 248 8c66.8 0 123 24.5 166.3 64.9l-67.5 64.9C258.5 52.6 94.3 116.6 94.3 256c0 86.5 69.1 156.6 153.7 156.6 98.2 0 135-70.4 140.8-106.9H248v-85.3h236.1c2.3 12.7 3.9 24.9 3.9 41.4z" />
-            </svg>
-            Login with Google
-          </Button>
+            loadingText="Signing in with Google..."
+          />
         </div>
         <div className="text-center text-sm">
           Don&apos;t have an account?{" "}
           <a href="/sign-up" className="underline underline-offset-4">
-            Sign up
+            {AUTH_BUTTON.SIGNUP}
           </a>
         </div>
       </form>
