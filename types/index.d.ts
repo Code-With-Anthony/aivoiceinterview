@@ -80,12 +80,15 @@ interface SignInParams {
 
 type UserRole = "candidate" | "recruiter"
 
+type CompanyType = "tech" | "non-tech" | "mix";
+
 interface SignUpParams {
   name: string;
   email: string;
   password?: string;
   role: UserRole;
   authProvider: string;
+  companyType?: CompanyType
 }
 
 type FormType = "sign-in" | "sign-up";

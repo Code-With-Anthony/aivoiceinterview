@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -32,6 +33,7 @@ export function LoginForm({
   const router = useRouter();
   const formSchema = getAuthFormSchema();
   const { handleGoogleAuth } = useGoogleAuth();
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -43,6 +45,7 @@ export function LoginForm({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
+      setLoading(true);
       if (!values || !values.email || !values.password) {
         return;
       }
@@ -105,6 +108,8 @@ export function LoginForm({
 
       toast.error(error?.code);
       console.error("Error signing in:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -151,10 +156,11 @@ export function LoginForm({
           </div>
           <AuthButton
             title={AUTH_BUTTON_TITLES.LOGIN}
-            onClick={onSubmit} // Pass form submit handler to onClick
+            onClick={form.handleSubmit(onSubmit)} // Pass form submit handler to onClick
             loadingText="Logging in..."
             variant="default"
             disabled={!form.formState.isValid}
+            loading={loading}
           />
           <div className="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t">
             <span className="bg-background text-muted-foreground relative z-10 px-2">

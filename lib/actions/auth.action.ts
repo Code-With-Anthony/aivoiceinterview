@@ -1,8 +1,8 @@
 "use server";
 
 import { auth, db } from "@/firebase/admin";
-import { auth as clientAuth } from "@/firebase/client"
-import { UserProfile } from "@/types/profile";
+import { auth as clientAuth } from "@/firebase/client";
+import { Admin, Company, UserProfile } from "@/types/profile";
 import { getAuth } from "firebase-admin/auth";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { cookies } from "next/headers";
@@ -10,9 +10,8 @@ import { cookies } from "next/headers";
 const ONE_WEEK = 60 * 60 * 24 * 7;
 
 export async function signUp(params: SignUpParams) {
-    const { name, email, authProvider = "email", role, password } = params;
-
-    if (!name || !email || !authProvider || !role || !password) {
+    const { name, email, authProvider = "email", role, password, companyType } = params;
+    if (!name || !email || !authProvider || !role || !password || (role === "recruiter" && !companyType)) {
         return {
             success: false,
         }
@@ -28,86 +27,140 @@ export async function signUp(params: SignUpParams) {
             };
         }
 
-        // const userRecord = await db.collection("users").doc(userExists?.uid).get();
-
-        // if (userRecord.exists) {
-        //     return {
-        //         success: false,
-        //         message: "User already exists. Please sign in instead.",
-        //     };
-        // }
-
         const newUser = await createUserWithEmailAndPassword(
             clientAuth,
-            email as string,
-            password as string
+            email,
+            password
         );
 
-        const userProfile: UserProfile = {
-            name,
-            email,
-            role,
-            authProvider,
-            bio: "",
-            personalDetails: {
-                age: null,
-                gender: "",
-                address: {
-                    street: "",
-                    city: "",
-                    state: "",
-                    pin: "",
-                },
-                image: "",
-                hobbies: [],
-            },
-            professionalDetails: {
-                totalExperience: "",
-                currentRole: [], // array of { designation, companyName, fromYear, toYear }
-                education: [], // array of { institution, degree, fieldOfStudy, fromYear, toYear }
-            },
-            experience: [], // array of { company, position, fromYear, toYear }
-            skills: [],
-            trainings: [],
-            certifications: [], // array of { name, date, url }
-            projects: [], // array of { name, description, url }
-            socialMedia: {
-                linkedIn: "",
-                dribbble: "",
-                hackerRank: "",
-                codeForces: "",
-                hackerEarth: "",
-                github: "",
-                stackoverflow: "",
-            },
-        };
+        const userId = newUser.user.uid;
 
-        await db.collection("users").doc(newUser.user.uid).set(userProfile);
+        if (role === "candidate") {
+            const candidateProfile: UserProfile = {
+                name,
+                email,
+                role,
+                authProvider,
+                bio: "",
+                personalDetails: {
+                    age: null,
+                    gender: "",
+                    address: {
+                        street: "",
+                        city: "",
+                        state: "",
+                        pin: "",
+                    },
+                    image: "",
+                    hobbies: [],
+                },
+                professionalDetails: {
+                    totalExperience: "",
+                    currentRole: [],
+                    education: [],
+                },
+                experience: [],
+                skills: [],
+                trainings: [],
+                certifications: [],
+                projects: [],
+                socialMedia: {
+                    linkedIn: "",
+                    dribbble: "",
+                    hackerRank: "",
+                    codeForces: "",
+                    hackerEarth: "",
+                    github: "",
+                    stackoverflow: "",
+                },
+            };
+
+            await db.collection("users").doc(userId).set(candidateProfile);
+        }
+
+        else if (role === "recruiter") {
+            const isTechCompany = companyType === "tech" || companyType === "mix";
+
+            const companyProfile: Company = {
+                name,
+                email,
+                role,
+                authProvider,
+                logo: "",
+                coverImage: "",
+                industry: "",
+                headquarters: "",
+                size: "",
+                foundedYear: "",
+                website: "",
+                description: "",
+                mission: "",
+                values: [],
+                products: [],
+                isTechCompany,
+                ...(isTechCompany && {
+                    techStack: {
+                        frontend: [],
+                        backend: [],
+                        database: [],
+                        devops: [],
+                        other: [],
+                    },
+                }),
+                reviews: [],
+                social: {
+                    linkedin: "",
+                    twitter: "",
+                    github: "",
+                    glassdoor: "",
+                },
+                verified: false,
+            };
+
+            await db.collection("users").doc(userId).set(companyProfile);
+        }
+
+        else if (role === "admin") {
+            const adminProfile: Admin = {
+                name,
+                email,
+                role,
+                authProvider,
+                adminDetails: {
+                    permissions: ["manageUsers", "moderateContent", "manageJobs", "sendNotifications"],
+                    createdAt: new Date().toISOString(),
+                    assignedSections: [],
+                    isSuperAdmin: false,
+                    notificationsEnabled: true,
+                },
+            };
+
+            await db.collection("users").doc(userId).set(adminProfile);
+        }
 
         return {
             success: true,
-            userId: newUser.user.uid,
-            idToke: newUser.user.getIdToken(),
+            userId,
+            idToken: newUser.user.getIdToken(),
             message: "User created successfully. Please sign in.",
-        }
-
+        };
     } catch (e: any) {
         console.error("Error Creating User:", e);
 
-        if (e?.code === 'auth/email-already-exists') {
+        if (e?.code === "auth/email-already-exists") {
             return {
                 success: false,
                 message: "Email already exists",
-            }
+            };
         }
 
         return {
             success: false,
             message: "Error creating user",
-        }
+        };
     }
-
 }
+
 
 // Helper function to check if a user already exists in Firebase Authentication
 export async function checkIfUserExists(email: string) {
@@ -116,10 +169,10 @@ export async function checkIfUserExists(email: string) {
         const userRecord = await auth.getUserByEmail(email);
         return userRecord ? userRecord : null;
     } catch (error) {
-        if (error?.code === 'auth/user-not-found') {
+        if (error?.code === "auth/user-not-found") {
             return false; // User doesn't exist
         }
-        console.error('Error checking user existence:', error);
+        console.error("Error checking user existence:", error);
         return false;
     }
 }
@@ -137,7 +190,7 @@ export async function setSessionCookie(idToken: string) {
         secure: process.env.NODE_ENV === "production",
         path: "/",
         sameSite: "lax",
-    })
+    });
 }
 
 export async function signIn(params: SignInParams) {
@@ -145,8 +198,8 @@ export async function signIn(params: SignInParams) {
     if (!email || !idToken || !authProvider) {
         return {
             success: false,
-            message: "All fields are neccessary"
-        }
+            message: "All fields are neccessary",
+        };
     }
     try {
         // Step 1: Check if user exists in Firebase Auth
@@ -174,14 +227,14 @@ export async function signIn(params: SignInParams) {
         return {
             success: true,
             user: userDoc.data(),
-        }
+        };
     } catch (e) {
         console.error("Error Signing In:", e);
 
         return {
             success: false,
             message: "Error signing in",
-        }
+        };
     }
 }
 
@@ -195,7 +248,10 @@ export async function getCurrentUser(): Promise<User | null> {
     try {
         const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
 
-        const userRecord = await db.collection("users").doc(decodedClaims.uid).get();
+        const userRecord = await db
+            .collection("users")
+            .doc(decodedClaims.uid)
+            .get();
 
         if (!userRecord.exists) {
             return null;
@@ -212,7 +268,6 @@ export async function getCurrentUser(): Promise<User | null> {
     } catch (error) {
         console.error("Error getting current user:", error);
         return null;
-
     }
 }
 

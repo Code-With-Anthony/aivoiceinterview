@@ -1,11 +1,14 @@
 "use client";
 
-import { AUTH_BUTTON_TITLES } from "@/constants";
+import { AUTH_BUTTON_TITLES, AuthProvider, ID_TOKEN_ERROR_SIGNIN, ROLE } from "@/constants";
+import { auth } from "@/firebase/client";
 import { signIn, signUp } from "@/lib/actions/auth.action";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -20,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "./ui/select";
-
 const getAuthFormSchema = () =>
   z.object({
     name: z
@@ -33,12 +35,24 @@ const getAuthFormSchema = () =>
     role: z.enum(["candidate", "recruiter"], {
       required_error: "Please Select atleast one role",
     }),
-  });
+    companyType: z
+      .enum(["tech", "non-tech", "mixed"])
+      .optional(), // Only required if role is recruiter
+  }).refine(
+    (data) => {
+      return data.role !== "recruiter" || (data.companyType !== undefined && data.companyType !== null)
+    },
+    {
+      message: "Please select company type",
+      path: ["companyType"],
+    }
+  );
 
 export function RegisterForm({ className }: React.ComponentProps<"form">) {
   const formSchema = getAuthFormSchema();
   const router = useRouter();
   const { setUser } = useUserStore();
+  const [loading, setLoading] = useState(false); // Add this line
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,31 +61,29 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
       email: "",
       password: "",
       role: undefined,
+      companyType: undefined,
     },
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      if (
-        !values ||
-        !values.name ||
-        !values.email ||
-        !values.password ||
-        !values.role
-      ) {
-        toast.error("Please fill all the field");
-        return;
+      setLoading(true);
+      const { name, email, password, role, companyType } = values;
+
+      // Dynamically building signUp payload
+      const signupPayload: SignUpParams = {
+        name,
+        email,
+        role: role as UserRole,
+        authProvider: AuthProvider.EMAIL,
+        password,
+      };
+
+      if (role === ROLE.RECRUITER && companyType) {
+        signupPayload.companyType = companyType as CompanyType;
       }
 
-      const { name, email, password, role } = values;
-
-      const result = await signUp({
-        name: name as string,
-        email: email as string,
-        role: role as UserRole,
-        authProvider: "email",
-        password: password,
-      });
+      const result = await signUp(signupPayload);
 
       if (result.success) {
         setUser({
@@ -79,7 +91,7 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
           name: name as string,
           email: email as string,
           role: role as string,
-          authProvider: "email",
+          authProvider: AuthProvider.EMAIL,
         });
       }
 
@@ -88,16 +100,30 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
         return;
       }
 
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      const idToken = await userCredentials.user.getIdToken();
+
+      if (!idToken) {
+        toast.error(ID_TOKEN_ERROR_SIGNIN);
+        return;
+      }
+
       await signIn({
-        email: email as string,
-        idToken: await result.idToke!,
+        email: email,
+        idToken: idToken,
+        authProvider: AuthProvider.EMAIL,
       });
 
       toast.success("Account created and signed in!");
 
-      if (role === "candidate") {
+      if (role === ROLE.CANDIDATE) {
         router.push("/dashboard");
-      } else if (role === "recruiter") {
+      } else if (role === ROLE.RECRUITER) {
         router.push("/recruiter");
       }
     } catch (error: any) {
@@ -119,8 +145,17 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
 
       toast.error(error?.code);
       console.error("Error signing in:", error);
+    } finally {
+      setLoading(false);
     }
   };
+  const role = form.watch("role");
+  useEffect(() => {
+    if (role !== ROLE.RECRUITER) {
+      // Reset companyType if role is not recruiter
+      form.setValue("companyType", undefined);
+    }
+  }, [role, form]);
 
   return (
     <Form {...form}>
@@ -180,12 +215,34 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
               )}
             </FormField>
           </div>
+          {form.watch("role") === "recruiter" && (
+            <div className="grid gap-3">
+              <FormField control={form.control} name="companyType" label="Company Type">
+                {(field, fieldState) => (
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <SelectTrigger
+                      className={`w-full ${fieldState.error ? "border-red-500" : ""}`}
+                    >
+                      <SelectValue placeholder="Select company type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="tech">Tech</SelectItem>
+                      <SelectItem value="non-tech">Non-Tech</SelectItem>
+                      <SelectItem value="mixed">Mixed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+              </FormField>
+            </div>
+          )}
+
           <AuthButton
             title={AUTH_BUTTON_TITLES.REGISTER}
-            onClick={onSubmit} // Pass form submit handler to onClick
+            onClick={form.handleSubmit(onSubmit)}
             loadingText="Registering...."
             variant="default"
             disabled={!form.formState.isValid}
+            loading={loading}
           />
         </div>
         <div className="text-center text-sm">

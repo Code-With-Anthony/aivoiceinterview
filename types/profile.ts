@@ -96,9 +96,39 @@ export interface Interview {
     completed: boolean
 }
 
+export interface TechStack {
+    frontend?: string[];
+    backend?: string[];
+    database?: string[];
+    devops?: string[];
+    other?: string[];
+}
+
+export interface Review {
+    id: string;
+    author: string;
+    avatar?: string;
+    position: string;
+    date: string;
+    title: string;
+    content: string;
+    pros?: string;
+    cons?: string;
+    ratings: {
+        workLifeBalance: number;
+        culture: number;
+        careerGrowth: number;
+        diversity: number;
+    };
+}
+
 export interface Company {
-    id: string
+    id?: string
     name: string
+    role: string
+    authProvider: string
+    email: string
+    isTechCompany: boolean
     logo: string
     coverImage?: string
     industry: string
@@ -113,30 +143,8 @@ export interface Company {
         name: string
         description: string
     }[]
-    techStack?: {
-        frontend?: string[]
-        backend?: string[]
-        database?: string[]
-        devops?: string[]
-        other?: string[]
-    }
-    reviews?: {
-        id: string
-        author: string
-        avatar?: string
-        position: string
-        date: string
-        title: string
-        content: string
-        pros?: string
-        cons?: string
-        ratings: {
-            workLifeBalance: number
-            culture: number
-            careerGrowth: number
-            diversity: number
-        }
-    }[]
+    techStack?: TechStack
+    reviews?: Review[]
     social?: {
         linkedin?: string
         twitter?: string
@@ -164,4 +172,30 @@ export interface Job {
     relatedInterviewId: string
     relatedInterviewTitle: string
     applyUrl: string
+}
+
+export interface Admin {
+    name: string
+    email: string
+    role: string
+    authProvider?: string;
+    adminDetails?: AdminDetails
+}
+
+export interface AdminDetails {
+    permissions: string[]; // e.g., ["manageUsers", "moderateContent", "viewReports"]
+    createdAt: string;     // ISO date
+    lastActiveAt?: string; // optional - ISO date
+    activityLogs?: AdminActivityLog[]; // optional
+    assignedSections?: string[]; // e.g., ["interviews", "jobs", "feedback"]
+    isSuperAdmin?: boolean; // special privileges
+    contactEmail?: string;
+    notificationsEnabled?: boolean;
+}
+
+export interface AdminActivityLog {
+    action: string;         // e.g., "deleted job", "banned user"
+    targetId?: string;      // optional (e.g., ID of job/user affected)
+    timestamp: string;      // ISO format
+    description?: string;   // optional human-readable info
 }
