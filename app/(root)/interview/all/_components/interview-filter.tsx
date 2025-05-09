@@ -303,11 +303,11 @@ export default function InterviewFilters() {
 
         <Button
           type="button"
-          className="hidden md:flex"
-          onClick={() => redirect("/interview/custom")}
+          className="hidden md:flex cursor-pointer"
+          onClick={() => redirect("/interview/create")}
         >
           <Sparkles />
-          Custom Interview
+          Create Interview
         </Button>
       </div>
 

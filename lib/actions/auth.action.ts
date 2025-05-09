@@ -73,6 +73,9 @@ export async function signUp(params: SignUpParams) {
                     github: "",
                     stackoverflow: "",
                 },
+                jobsApplied: [],
+                completedInterview: [],
+
             };
 
             await db.collection("users").doc(userId).set(candidateProfile);

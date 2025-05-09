@@ -16,7 +16,7 @@ export default function CreateCustomInterview({
 }) {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({});
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
   const [interviewId, setInterviewId] = useState(null);
   const router = useRouter();
 

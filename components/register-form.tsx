@@ -119,6 +119,9 @@ export function RegisterForm({ className }: React.ComponentProps<"form">) {
         authProvider: AuthProvider.EMAIL,
       });
 
+      // Reset the form before redirection
+      form.reset();
+
       toast.success("Account created and signed in!");
 
       if (role === ROLE.CANDIDATE) {

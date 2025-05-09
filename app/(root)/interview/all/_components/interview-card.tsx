@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import Image from "next/image";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,6 +11,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { getBrandLogo } from "@/lib/data";
+import { useUserStore } from "@/lib/store/useUserStore";
+import { cn } from "@/lib/utils";
+import type { Interview } from "@/types/profile";
 import {
   AudioLines,
   CalendarDays,
@@ -20,12 +23,10 @@ import {
   ExternalLink,
   Star,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import type { Interview } from "@/types/profile";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useEffect, useState } from "react";
-import { getBrandLogo } from "@/lib/data";
 import { useTheme } from "next-themes";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+
 interface InterviewCardProps {
   interview: Interview;
 }
@@ -33,6 +34,7 @@ interface InterviewCardProps {
 export default function InterviewCard({ interview }: InterviewCardProps) {
   // Track window size using useState and useEffect
   const [windowWidth, setWindowWidth] = useState(0);
+  const { user } = useUserStore(state => state)
 
   const maxBadgesSm = 2; // For small screens (sm)
   const maxBadgesMd = 2; // For medium screens (md)
@@ -100,12 +102,26 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
     windowWidth <= 640
       ? techStack.slice(0, maxBadgesSm) // For small screens (mobile)
       : windowWidth <= 1024
-      ? techStack.slice(0, maxBadgesMd) // For medium screens (tablets/laptops)
-      : techStack.slice(0, maxBadgesLg); // For large screens (desktops)
+        ? techStack.slice(0, maxBadgesMd) // For medium screens (tablets/laptops)
+        : techStack.slice(0, maxBadgesLg); // For large screens (desktops)
 
   // Calculate remaining count based on the visible number of badges
   const remainingCount = techStack.length - displayedTechs.length;
   const theme = useTheme();
+
+  const router = useRouter();
+
+  const handleStartInterview = () => {
+    if (!user) {
+      router.push("/sign-in");
+    } else {
+      router.push(`/interview/${id}`);
+    }
+  };
+
+  const handleViewInterviewDetails = () => {
+    router.push(`/interview/${id}`);
+  }
 
   return (
     <Card className="h-full flex flex-col transition-all hover:shadow-md">
@@ -181,20 +197,22 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
         </div>
       </CardContent>
       <CardFooter className="flex flex-col md:flex-row gap-2 pt-0 px-4">
-        <Link href={`/interview/${id}`} className="w-full">
-          <Button variant="outline" className="w-full cursor-pointer">
+        <div className="w-full">
+          <Button variant="outline" className="w-full cursor-pointer" onClick={handleViewInterviewDetails}>
             View Details
             <ExternalLink className="h-4 w-4" />
           </Button>
-        </Link>
-        <Link href={`/interview/${id}`} className="w-full">
+        </div>
+        <div className="w-full">
+
           <Button
+            onClick={handleStartInterview}
             className="w-full cursor-pointer"
             variant={completed ? "secondary" : "default"}
           >
             {completed ? "View Results" : "Take Interview"}
           </Button>
-        </Link>
+        </div>
       </CardFooter>
     </Card>
   );

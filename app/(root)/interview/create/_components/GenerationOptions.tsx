@@ -1,4 +1,5 @@
 import { Card } from "@/components/ui/card";
+import { UserIcon } from "lucide-react";
 import React from "react";
 
 const GenerationOptions = ({ onSelectGenerationOption }) => {
@@ -11,7 +12,7 @@ const GenerationOptions = ({ onSelectGenerationOption }) => {
         <div className="flex flex-col gap-4 h-full justify-between">
           <div>
             <h1 className="text-2xl font-semibold text-blue-700 dark:text-blue-300">
-              🤖 Custom Automate Interview
+              🤖 AI Interview Generation
             </h1>
             <p className="text-sm text-muted-foreground mt-2">
               Use AI to generate customized interviews automatically.
@@ -26,8 +27,8 @@ const GenerationOptions = ({ onSelectGenerationOption }) => {
       >
         <div className="flex flex-col gap-4 h-full justify-between">
           <div>
-            <h1 className="text-2xl font-semibold text-green-700 dark:text-green-300">
-              ✍️ Manual Interview Setup
+            <h1 className="text-2xl font-semibold text-green-700 dark:text-green-300 flex gap-2 items-center">
+              <UserIcon /> <span> Manual Interview Generation</span>
             </h1>
             <p className="text-sm text-muted-foreground mt-2">
               Customize interviews manually by selecting questions and fields.

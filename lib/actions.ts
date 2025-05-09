@@ -150,3 +150,10 @@ export async function deleteUserProfile(userId: string): Promise<boolean> {
     // Simulate a database delete
     return true
 }
+
+// Create a new interview
+export async function createInterview(data: any): Promise<{ id: string }> {
+    console.log("Creating interview:", data)
+    // Simulate a database create
+    return { id: "interview-" + Math.random().toString(36).substring(2, 9) }
+}

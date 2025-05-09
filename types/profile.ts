@@ -13,6 +13,8 @@ export interface UserProfile {
     certifications?: Certification[]
     projects?: Project[]
     socialMedia?: SocialMedia
+    jobsApplied?: []
+    completedInterview: []
 }
 
 export interface PersonalDetails {
