@@ -142,21 +142,19 @@
   /* p {
     @apply dark:text-black text-black;
   } */
-  h2 {
+  /* h2 {
     @apply text-3xl font-semibold;
-  }
-  h3 {
+  } */
+  /* h3 {
     @apply text-2xl font-semibold;
-  }
+  } */
 
   li {
     @apply dark:text-primary text-black;
   }
-
 }
 
 @layer components {
-
   .btn-call {
     @apply inline-block px-7 py-3 font-bold text-sm leading-5 text-white transition-colors duration-150 bg-success-100 border border-transparent rounded-full shadow-sm focus:outline-none focus:shadow-2xl active:bg-success-200 hover:bg-success-200 min-w-28 cursor-pointer items-center justify-center overflow-visible;
 
