@@ -11,17 +11,22 @@ import {
   Code,
   Layers,
   AlertCircle,
+  AudioLines,
+  Code2,
 } from "lucide-react";
+import ExpandableDescription from "./expandable-interview-content";
+import TechStack from "./text-stack-preview";
 
 interface InterviewPreviewProps {
   formData: any;
+  techStack: string[];
 }
 
-export default function InterviewPreview({ formData }: InterviewPreviewProps) {
+export default function InterviewPreview({ formData, techStack }: InterviewPreviewProps) {
   const {
     type,
     area,
-    techStack,
+    // techStack,
     level,
     description,
     dateType,
@@ -34,6 +39,8 @@ export default function InterviewPreview({ formData }: InterviewPreviewProps) {
     numberOfQuestions,
     questions,
   } = formData;
+  console.log("formData", formData);
+  console.log("techstack", techStack);
 
   const getDifficultyColor = (level: string) => {
     switch (level) {
@@ -43,6 +50,8 @@ export default function InterviewPreview({ formData }: InterviewPreviewProps) {
         return "bg-amber-50 text-amber-700 border-amber-200";
       case "Hard":
         return "bg-rose-50 text-rose-700 border-rose-200";
+      case "Expert":
+        return "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100";
       default:
         return "bg-gray-50 text-gray-700 border-gray-200";
     }
@@ -99,14 +108,15 @@ export default function InterviewPreview({ formData }: InterviewPreviewProps) {
           <div className="flex justify-between items-start">
             <div>
               <h3 className="text-xl font-bold text-primary">
-                {type} Interview
-                {area && ` - ${area}`}
+                {/* {type} Interview */}
+                {area ? `${area}` : 'Interview Title'}
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
                 {category} • {numberOfQuestions} questions • {durationLimit}{" "}
                 minutes
               </p>
             </div>
+
             <Badge className={getStatusColor(status)}>{status}</Badge>
           </div>
         </div>
@@ -116,28 +126,22 @@ export default function InterviewPreview({ formData }: InterviewPreviewProps) {
               <Badge className={getDifficultyColor(level)} variant="outline">
                 {level} Difficulty
               </Badge>
-              {type === "Coding" && techStack && techStack.length > 0 && (
-                <div className="flex flex-wrap gap-1">
-                  {techStack.map((tech: string) => (
-                    <Badge
-                      key={tech}
-                      variant="outline"
-                      className="bg-blue-50 text-blue-700 border-blue-200"
-                    >
-                      {tech}
-                    </Badge>
-                  ))}
-                </div>
+              <Badge variant="outline" className="mr-1">
+                {
+                  type === "Voice" ? <><AudioLines /> <p>Voice</p> </> : type === "Coding" ? <><Code2 /> <p>Coding</p> </> : <><Code /> <p>Mix</p> </>
+                }
+              </Badge>
+              {techStack && techStack.length > 0 && (
+                <TechStack techStack={techStack} />
               )}
+
             </div>
 
             <div>
               <h3 className="text-sm font-medium text-muted-foreground mb-2">
                 DESCRIPTION
               </h3>
-              <p className="text-sm">
-                {description || "No description provided"}
-              </p>
+              <ExpandableDescription description={description || "No description provided"} />
             </div>
 
             <Separator />
@@ -194,19 +198,19 @@ export default function InterviewPreview({ formData }: InterviewPreviewProps) {
             {(!questions ||
               questions.length === 0 ||
               !questions[0].question) && (
-              <div className="flex items-center gap-3 text-muted-foreground">
-                <AlertCircle className="h-5 w-5" />
-                <p className="text-sm">
-                  Add questions to see them in the preview
-                </p>
-              </div>
-            )}
+                <div className="flex items-center gap-3 text-muted-foreground">
+                  <AlertCircle className="h-5 w-5" />
+                  <p className="text-sm">
+                    Add questions to see them in the preview
+                  </p>
+                </div>
+              )}
           </div>
         </CardContent>
       </Card>
 
       <Card className="overflow-hidden border-none shadow-md">
-        <CardHeader className="bg-gradient-to-r from-gray-50 to-white p-6">
+        <CardHeader className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
           <CardTitle className="text-base">Interview Details</CardTitle>
         </CardHeader>
         <CardContent className="p-6 space-y-4">
@@ -243,7 +247,7 @@ export default function InterviewPreview({ formData }: InterviewPreviewProps) {
           </div>
 
           <div className="mt-4 rounded-lg overflow-hidden border border-gray-100">
-            <div className="relative h-24 w-full bg-gradient-to-r from-gray-50 to-white flex items-center justify-center">
+            <div className="relative h-24 w-full bg-gradient-to-r flex items-center justify-center">
               <div className="text-center">
                 <p className="text-sm font-medium">Interview Link</p>
                 <p className="text-xs text-muted-foreground">

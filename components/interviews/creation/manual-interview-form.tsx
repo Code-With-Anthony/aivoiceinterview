@@ -1,27 +1,31 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { format } from "date-fns";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  ArrowLeft,
+  CalendarIcon,
+  Clock,
+  Eye,
+  FileCheck,
+  HelpCircle,
+  Layers,
+  Plus,
+  Save,
+  Trash2,
+} from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { format } from "date-fns";
-import { motion, AnimatePresence } from "framer-motion";
-import {
-  CalendarIcon,
-  Plus,
-  Trash2,
-  Clock,
-  Layers,
-  HelpCircle,
-  ArrowLeft,
-  Eye,
-  Save,
-  FileCheck,
-} from "lucide-react";
 
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
+
+import { MultiSelect } from "@/components/multi-select";
 import {
   Form,
   FormControl,
@@ -33,6 +37,12 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -40,24 +50,17 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-import { cn } from "@/lib/utils";
-import InterviewPreview from "./interview-preview";
 import { createInterview } from "@/lib/actions";
+import { cn } from "@/lib/utils";
+import { programmingLogosList } from "@/public/TechIcons/programmingLogosList";
+import InterviewPreview from "./interview-preview";
+import InterviewCard from "@/app/(root)/interview/all/_components/interview-card";
 
 // Define the form schema with Zod
 const formSchema = z.object({
@@ -91,6 +94,7 @@ export default function ManualInterviewForm() {
   const router = useRouter();
   const [formCompletion, setFormCompletion] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
 
   // Initialize the form
   const form = useForm<FormValues>({
@@ -198,20 +202,36 @@ export default function ManualInterviewForm() {
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Easy":
-        return "bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100";
+        return `
+          bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100 peer-checked:border-emerald-600
+          dark:bg-emerald-800 dark:text-white dark:border-emerald-600 dark:hover:bg-emerald-700 dark:peer-checked:border-white
+        `;
       case "Medium":
-        return "bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100";
+        return `
+          bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100 peer-checked:border-amber-600
+          dark:bg-amber-800 dark:text-white dark:border-amber-600 dark:hover:bg-amber-700 dark:peer-checked:border-white
+        `;
       case "Hard":
-        return "bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100";
+        return `
+          bg-rose-50 text-rose-700 border-rose-200 hover:bg-rose-100 peer-checked:border-rose-600
+          dark:bg-rose-800 dark:text-white dark:border-rose-600 dark:hover:bg-rose-700 dark:peer-checked:border-white
+        `;
       case "Expert":
-        return "bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100";
+        return `
+          bg-indigo-50 text-indigo-700 border-indigo-200 hover:bg-indigo-100 peer-checked:border-indigo-600
+          dark:bg-indigo-800 dark:text-white dark:border-indigo-600 dark:hover:bg-indigo-700 dark:peer-checked:border-white
+        `;
       default:
-        return "bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100";
+        return `
+          bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100 peer-checked:border-gray-600
+          dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:peer-checked:border-white
+        `;
     }
   };
 
+
   return (
-    <div className="max-w-7xl mx-auto">
+    <div className=" mx-auto">
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Form Section */}
         <div className="flex-1">
@@ -227,8 +247,8 @@ export default function ManualInterviewForm() {
                         formCompletion < 30
                           ? "bg-rose-500"
                           : formCompletion < 70
-                          ? "bg-amber-500"
-                          : "bg-emerald-500"
+                            ? "bg-amber-500"
+                            : "bg-emerald-500"
                       )}
                       style={{ width: `${formCompletion}%` }}
                     />
@@ -249,122 +269,116 @@ export default function ManualInterviewForm() {
                       <h3>Basic Details</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <FormField
-                        control={form.control}
-                        name="type"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Interview Type</FormLabel>
-                            <div className="grid grid-cols-3 gap-2">
-                              {["Voice", "Coding", "Mix"].map((type) => (
-                                <div key={type} className="relative">
-                                  <input
-                                    type="radio"
-                                    id={`type-${type}`}
-                                    value={type}
-                                    checked={field.value === type}
-                                    onChange={() => field.onChange(type)}
-                                    className="peer sr-only"
-                                  />
-                                  <label
-                                    htmlFor={`type-${type}`}
-                                    className="flex flex-col items-center justify-center h-24 rounded-lg border-2 border-muted bg-popover p-2 
-    hover:bg-accent hover:text-accent-foreground 
-    peer-checked:border-primary 
-    peer-checked:bg-accent/50 
-    peer-checked:text-primary 
-    transition-colors"
-                                  >
-                                    <div className="mb-2 rounded-full bg-primary/10 p-1">
-                                      {type === "Voice" && (
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          className="text-primary"
-                                        >
-                                          <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                                          <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                          <line
-                                            x1="12"
-                                            x2="12"
-                                            y1="19"
-                                            y2="22"
-                                          ></line>
-                                        </svg>
-                                      )}
-                                      {type === "Coding" && (
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          className="text-primary"
-                                        >
-                                          <polyline points="16 18 22 12 16 6"></polyline>
-                                          <polyline points="8 6 2 12 8 18"></polyline>
-                                        </svg>
-                                      )}
-                                      {type === "Mix" && (
-                                        <svg
-                                          xmlns="http://www.w3.org/2000/svg"
-                                          width="24"
-                                          height="24"
-                                          viewBox="0 0 24 24"
-                                          fill="none"
-                                          stroke="currentColor"
-                                          strokeWidth="2"
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          className="text-primary"
-                                        >
-                                          <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-                                          <path d="M13 7a2 2 0 0 1 5 0v10a2 2 0 0 1-5 0V7Z"></path>
-                                        </svg>
-                                      )}
-                                    </div>
-                                    <div className="text-sm font-medium">
-                                      {type}
-                                    </div>
-                                  </label>
-                                  {/* {field.value === type && (
-                                    <motion.div
-                                      className="absolute -bottom-1 left-1/2 w-4 h-4 -ml-2 rotate-45 border-b-2 border-r-2 border-primary bg-popover"
-                                      initial={{ opacity: 0, y: -5 }}
-                                      animate={{ opacity: 1, y: 0 }}
-                                      transition={{ duration: 0.2 }}
+                    <div className="space-y-6">
+                      {/* Interview Type - full row */}
+                      <div className="w-full">
+                        <FormField
+                          control={form.control}
+                          name="type"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Interview Type</FormLabel>
+                              <div className="flex flex-wrap gap-2 w-full">
+                                {["Voice", "Coding", "Mix"].map((type) => (
+                                  <div key={type} className="w-full sm:w-auto flex-1 min-w-[120px]">
+                                    <input
+                                      type="radio"
+                                      id={`type-${type}`}
+                                      value={type}
+                                      checked={field.value === type}
+                                      onChange={() => field.onChange(type)}
+                                      className="peer sr-only"
                                     />
-                                  )} */}
-                                </div>
-                              ))}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                                    <label
+                                      htmlFor={`type-${type}`}
+                                      className="flex flex-col items-center justify-center h-24 rounded-lg border-2 border-muted bg-popover p-2 
+                    hover:bg-accent hover:text-accent-foreground 
+                    peer-checked:border-primary 
+                    peer-checked:bg-accent/50 
+                    peer-checked:text-primary 
+                    transition-colors !cursor-pointer"
+                                    >
+                                      <div className="mb-2 rounded-full bg-primary/10 p-1">
+                                        {type === "Voice" && (
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="text-primary"
+                                          >
+                                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                            <line
+                                              x1="12"
+                                              x2="12"
+                                              y1="19"
+                                              y2="22"
+                                            ></line>
+                                          </svg>
+                                        )}
+                                        {type === "Coding" && (
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="text-primary"
+                                          >
+                                            <polyline points="16 18 22 12 16 6"></polyline>
+                                            <polyline points="8 6 2 12 8 18"></polyline>
+                                          </svg>
+                                        )}
+                                        {type === "Mix" && (
+                                          <svg
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            width="24"
+                                            height="24"
+                                            viewBox="0 0 24 24"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            strokeWidth="2"
+                                            strokeLinecap="round"
+                                            strokeLinejoin="round"
+                                            className="text-primary"
+                                          >
+                                            <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                                            <path d="M13 7a2 2 0 0 1 5 0v10a2 2 0 0 1-5 0V7Z"></path>
+                                          </svg>
+                                        )}
+                                      </div>
+                                      <div className="text-sm font-medium">{type}</div>
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
-                      <FormField
-                        control={form.control}
-                        name="level"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Difficulty Level</FormLabel>
-                            <div className="grid grid-cols-2 gap-2">
-                              {["Easy", "Medium", "Hard", "Expert"].map(
-                                (level) => (
-                                  <div key={level} className="relative">
+                      {/* Difficulty Level - full row */}
+                      <div className="w-full">
+                        <FormField
+                          control={form.control}
+                          name="level"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Difficulty Level</FormLabel>
+                              <div className="flex flex-wrap gap-2 w-full">
+                                {["Easy", "Medium", "Hard", "Expert"].map((level) => (
+                                  <div key={level} className="w-full sm:w-auto flex-1 min-w-[100px]">
                                     <input
                                       type="radio"
                                       id={`level-${level}`}
@@ -376,24 +390,24 @@ export default function ManualInterviewForm() {
                                     <label
                                       htmlFor={`level-${level}`}
                                       className={cn(
-                                        "flex h-10 items-center justify-center rounded-md border text-sm transition-colors hover:bg-muted peer-data-[state=checked]:border-primary peer-data-[state=checked]:text-primary",
+                                        "flex h-10 items-center justify-center rounded-md border text-sm transition-colors hover:bg-muted peer-checked:border-primary peer-checked:text-primary !cursor-pointer",
                                         getLevelColor(level)
                                       )}
                                     >
                                       {level}
                                     </label>
                                   </div>
-                                )
-                              )}
-                            </div>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                                ))}
+                              </div>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
                     </div>
 
                     <AnimatePresence>
-                      {(watchType === "Voice" || watchType === "Mix") && (
+                      {(watchType === "Voice" || watchType === "Mix" || watchType === "Coding") && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
@@ -405,40 +419,16 @@ export default function ManualInterviewForm() {
                             control={form.control}
                             name="area"
                             render={({ field }) => (
-                              <FormItem className="w-full">
-                                <FormLabel>Interview Area</FormLabel>
-                                <Select
-                                  onValueChange={field.onChange}
-                                  defaultValue={field.value}
-                                >
-                                  <FormControl>
-                                    <SelectTrigger className="h-10 w-full">
-                                      <SelectValue placeholder="Select area" />
-                                    </SelectTrigger>
-                                  </FormControl>
-                                  <SelectContent>
-                                    <SelectItem value="Management">
-                                      Management
-                                    </SelectItem>
-                                    <SelectItem value="HR">HR</SelectItem>
-                                    <SelectItem value="Sales">Sales</SelectItem>
-                                    <SelectItem value="Purchase">
-                                      Purchase
-                                    </SelectItem>
-                                    <SelectItem value="Marketing">
-                                      Marketing
-                                    </SelectItem>
-                                    <SelectItem value="Engineering">
-                                      Engineering
-                                    </SelectItem>
-                                    <SelectItem value="Design">
-                                      Design
-                                    </SelectItem>
-                                    <SelectItem value="Finance">
-                                      Finance
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
+                              <FormItem className="w-full p-1">
+                                <FormLabel>Interview Title</FormLabel>
+                                <FormControl>
+                                  <input
+                                    type="text"
+                                    {...field}
+                                    placeholder="eg: software engineer"
+                                    className="h-10 w-full border rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-primary"
+                                  />
+                                </FormControl>
                                 <FormMessage />
                               </FormItem>
                             )}
@@ -447,8 +437,9 @@ export default function ManualInterviewForm() {
                       )}
                     </AnimatePresence>
 
+
                     <AnimatePresence>
-                      {(watchType === "Coding" || watchType === "Mix") && (
+                      {(watchType === "Coding" || watchType === "Mix" || watchType === "Voice") && (
                         <motion.div
                           initial={{ opacity: 0, height: 0 }}
                           animate={{ opacity: 1, height: "auto" }}
@@ -468,59 +459,17 @@ export default function ManualInterviewForm() {
                                     interview.
                                   </FormDescription>
                                 </div>
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
-                                  {[
-                                    "JS",
-                                    "React",
-                                    "Node",
-                                    "Angular",
-                                    "CSS",
-                                    "TS",
-                                    "Python",
-                                    "Java",
-                                    "C#",
-                                    "PHP",
-                                  ].map((tech) => (
-                                    <FormField
-                                      key={tech}
-                                      control={form.control}
-                                      name="techStack"
-                                      render={({ field }) => {
-                                        return (
-                                          <FormItem
-                                            key={tech}
-                                            className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-2 hover:bg-muted"
-                                          >
-                                            <FormControl>
-                                              <Checkbox
-                                                checked={field.value?.includes(
-                                                  tech
-                                                )}
-                                                onCheckedChange={(checked) => {
-                                                  const current =
-                                                    field.value || [];
-                                                  return checked
-                                                    ? field.onChange([
-                                                        ...current,
-                                                        tech,
-                                                      ])
-                                                    : field.onChange(
-                                                        current.filter(
-                                                          (value) =>
-                                                            value !== tech
-                                                        )
-                                                      );
-                                                }}
-                                              />
-                                            </FormControl>
-                                            <FormLabel className="font-normal cursor-pointer">
-                                              {tech}
-                                            </FormLabel>
-                                          </FormItem>
-                                        );
-                                      }}
-                                    />
-                                  ))}
+                                <div className="w-full">
+                                  {/* MultiSelect component to replace the checkbox grid */}
+                                  <MultiSelect
+                                    options={programmingLogosList}
+                                    value={selectedFrameworks} // current selected value
+                                    onValueChange={setSelectedFrameworks} // update selected values
+                                    placeholder="Select frameworks"
+                                    variant="inverted"
+                                    animation={2}
+                                    maxCount={4} // limit number of items selected
+                                  />
                                 </div>
                                 <FormMessage />
                               </FormItem>
@@ -539,7 +488,7 @@ export default function ManualInterviewForm() {
                           <FormControl>
                             <Textarea
                               placeholder="Provide a detailed description of the interview"
-                              className="resize-none min-h-[120px]"
+                              className="resize-none min-h-[120px] max-h-[420px]"
                               {...field}
                             />
                           </FormControl>
@@ -560,7 +509,7 @@ export default function ManualInterviewForm() {
                       <h3>Scheduling & Duration</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
                         control={form.control}
                         name="dateType"
@@ -596,6 +545,41 @@ export default function ManualInterviewForm() {
                         )}
                       />
 
+                      <FormField
+                        control={form.control}
+                        name="duration"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Availability Duration</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <div className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted cursor-pointer" onClick={() => field.onChange("Permanent")}>
+                                  <FormControl>
+                                    <RadioGroupItem value="Permanent" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Permanently available
+                                  </FormLabel>
+                                </div>
+                                <div className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted cursor-pointer" onClick={() => field.onChange("Limited")}>
+                                  <FormControl>
+                                    <RadioGroupItem value="Limited" />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Limited time period
+                                  </FormLabel>
+                                </div>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
                       <AnimatePresence>
                         {watchDateType === "Future" && (
                           <motion.div
@@ -617,9 +601,9 @@ export default function ManualInterviewForm() {
                                         <Button
                                           variant={"outline"}
                                           className={cn(
-                                            "w-full pl-3 text-left font-normal",
+                                            "!w-full pl-3 text-left font-normal",
                                             !field.value &&
-                                              "text-muted-foreground"
+                                            "text-muted-foreground"
                                           )}
                                         >
                                           {field.value ? (
@@ -632,7 +616,7 @@ export default function ManualInterviewForm() {
                                       </FormControl>
                                     </PopoverTrigger>
                                     <PopoverContent
-                                      className="w-auto p-0"
+                                      className="w-full sm:w-auto p-0"
                                       align="start"
                                     >
                                       <Calendar
@@ -640,7 +624,9 @@ export default function ManualInterviewForm() {
                                         selected={field.value}
                                         onSelect={field.onChange}
                                         disabled={(date) => date < new Date()}
-                                        initialFocus
+                                        // initialFocus
+                                        autoFocus
+                                        className="rounded-md border shadow"
                                       />
                                     </PopoverContent>
                                   </Popover>
@@ -652,41 +638,6 @@ export default function ManualInterviewForm() {
                         )}
                       </AnimatePresence>
 
-                      <FormField
-                        control={form.control}
-                        name="duration"
-                        render={({ field }) => (
-                          <FormItem className="space-y-3">
-                            <FormLabel>Availability Duration</FormLabel>
-                            <FormControl>
-                              <RadioGroup
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
-                                className="flex flex-col space-y-1"
-                              >
-                                <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted">
-                                  <FormControl>
-                                    <RadioGroupItem value="Permanent" />
-                                  </FormControl>
-                                  <FormLabel className="font-normal cursor-pointer">
-                                    Permanently available
-                                  </FormLabel>
-                                </FormItem>
-                                <FormItem className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted">
-                                  <FormControl>
-                                    <RadioGroupItem value="Limited" />
-                                  </FormControl>
-                                  <FormLabel className="font-normal cursor-pointer">
-                                    Limited time period
-                                  </FormLabel>
-                                </FormItem>
-                              </RadioGroup>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
                       <AnimatePresence>
                         {watchDuration === "Limited" && (
                           <motion.div
@@ -694,7 +645,7 @@ export default function ManualInterviewForm() {
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
                             transition={{ duration: 0.3 }}
-                            className="overflow-hidden col-span-2"
+                            className="overflow-hidden col-span-1"
                           >
                             <FormField
                               control={form.control}
@@ -722,7 +673,192 @@ export default function ManualInterviewForm() {
                           </motion.div>
                         )}
                       </AnimatePresence>
+                    </div> */}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {/* Availability */}
+                      <FormField
+                        control={form.control}
+                        name="dateType"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Availability</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <FormItem
+                                  className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted cursor-pointer"
+                                  onClick={() => field.onChange("Current")}
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      value="Current"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Available immediately
+                                  </FormLabel>
+                                </FormItem>
+
+                                <FormItem
+                                  className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted cursor-pointer"
+                                  onClick={() => field.onChange("Future")}
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      value="Future"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Schedule for future date
+                                  </FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Availability Duration */}
+                      <FormField
+                        control={form.control}
+                        name="duration"
+                        render={({ field }) => (
+                          <FormItem className="space-y-3">
+                            <FormLabel>Availability Duration</FormLabel>
+                            <FormControl>
+                              <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex flex-col space-y-1"
+                              >
+                                <FormItem
+                                  className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted cursor-pointer"
+                                  onClick={() => field.onChange("Permanent")}
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      value="Permanent"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Permanently available
+                                  </FormLabel>
+                                </FormItem>
+
+                                <FormItem
+                                  className="flex items-center space-x-3 space-y-0 rounded-md border p-3 hover:bg-muted cursor-pointer"
+                                  onClick={() => field.onChange("Limited")}
+                                >
+                                  <FormControl>
+                                    <RadioGroupItem
+                                      value="Limited"
+                                    />
+                                  </FormControl>
+                                  <FormLabel className="font-normal cursor-pointer">
+                                    Limited time period
+                                  </FormLabel>
+                                </FormItem>
+                              </RadioGroup>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      {/* Show Scheduled Date when "Future" is selected */}
+                      <AnimatePresence>
+                        {watchDateType === "Future" && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="scheduledDate"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-col">
+                                  <FormLabel>Scheduled Date</FormLabel>
+                                  <Popover>
+                                    <PopoverTrigger asChild>
+                                      <FormControl>
+                                        <Button
+                                          variant={"outline"}
+                                          className={cn(
+                                            "!w-full pl-3 text-left font-normal",
+                                            !field.value && "text-muted-foreground"
+                                          )}
+                                        >
+                                          {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                                          <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                                        </Button>
+                                      </FormControl>
+                                    </PopoverTrigger>
+                                    <PopoverContent
+                                      className="w-full sm:w-auto p-0"
+                                      align="start"
+                                    >
+                                      <Calendar
+                                        mode="single"
+                                        selected={field.value}
+                                        onSelect={field.onChange}
+                                        disabled={(date) => date < new Date()}
+                                        autoFocus
+                                        className="rounded-md border shadow"
+                                      />
+                                    </PopoverContent>
+                                  </Popover>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
+
+                      {/* Show Duration Period when "Limited" is selected */}
+                      <AnimatePresence>
+                        {watchDuration === "Limited" && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: "auto" }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden col-span-1"
+                          >
+                            <FormField
+                              control={form.control}
+                              name="durationPeriod"
+                              render={({ field }) => (
+                                <FormItem className="w-full">
+                                  <FormLabel>Duration Period (days)</FormLabel>
+                                  <FormControl>
+                                    <Input
+                                      type="number"
+                                      min={1}
+                                      className="w-full"
+                                      {...field}
+                                      onChange={(e) =>
+                                        field.onChange(Number.parseInt(e.target.value))
+                                      }
+                                    />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
+
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <FormField
@@ -744,7 +880,7 @@ export default function ManualInterviewForm() {
                                   }
                                   className="pr-12"
                                 />
-                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-muted-foreground">
+                                <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none text-sm text-muted-foreground">
                                   min
                                 </div>
                               </div>
@@ -998,30 +1134,30 @@ export default function ManualInterviewForm() {
                     </div>
                   </div>
 
-                  <div className="flex justify-between pt-6">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-6">
                     <Button
                       type="button"
                       variant="outline"
                       onClick={() => router.back()}
-                      className="gap-2"
+                      className="gap-2 w-full sm:w-auto"
                     >
                       <ArrowLeft className="h-4 w-4" /> Back
                     </Button>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                       <Button
                         type="button"
                         variant="outline"
                         onClick={() =>
                           form.handleSubmit(() => form.trigger())()
                         }
-                        className="gap-2"
+                        className="gap-2 w-full sm:w-auto"
                       >
                         <Save className="h-4 w-4" /> Save Draft
                       </Button>
                       <Button
                         type="submit"
                         disabled={isSubmitting}
-                        className="gap-2"
+                        className="gap-2 w-full sm:w-auto"
                       >
                         {isSubmitting ? (
                           <>
@@ -1072,7 +1208,27 @@ export default function ManualInterviewForm() {
                 </Badge>
               </div>
               <div className="overflow-auto max-h-[calc(100vh-150px)] pr-2 -mr-2">
-                <InterviewPreview formData={form.getValues()} />
+                <InterviewCard
+                  interview={{
+                    id: "1",
+                    companyName: "Apple",
+                    companyLogo: "apple.com",
+                    name: "MERN Stack Developer",
+                    type: "Technical",
+                    coding: true,
+                    level: "Medium",
+                    score: null,
+                    date: {
+                      type: "permanent",
+                      value: "Always available",
+                    },
+                    description:
+                      "This interview assesses your proficiency with the MERN stack (MongoDB, Express.js, React, Node.js) and your ability to build full-stack web applications.",
+                    techStack: ["MongoDB", "Express.js", "React", "Node.js"],
+                    completed: false,
+                  }}
+                />
+                <InterviewPreview formData={form.getValues()} techStack={selectedFrameworks} />
               </div>
             </div>
           </div>
