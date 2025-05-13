@@ -39,7 +39,7 @@ const TechStack = ({ techStack }: { techStack: string[] }) => {
             {techStack.length > 5 && (
                 <button
                     onClick={toggleShowMore}
-                    className="mt-2 text-sm text-blue-600 cursor-pointer hover:underline"
+                    className="mt-2 ml-2 text-sm cursor-pointer hover:underline"
                 >
                     {showMore ? "Show Less" : `+ ${techStack.length - 5} more`}
                 </button>

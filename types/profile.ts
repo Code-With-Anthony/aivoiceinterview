@@ -96,6 +96,12 @@ export interface Interview {
     description: string
     techStack: string[]
     completed: boolean
+    duration?: number
+    numberOfQuestions?: number
+    questions?: {
+        question: string
+        expectedAnswer?: string
+    }[]
 }
 
 export interface TechStack {

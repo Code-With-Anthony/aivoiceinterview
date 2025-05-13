@@ -1,5 +1,6 @@
 "use client";
 
+import TechStack from "@/components/interviews/creation/text-stack-preview";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -15,7 +16,9 @@ import { getBrandLogo } from "@/lib/data";
 import { useUserStore } from "@/lib/store/useUserStore";
 import { cn } from "@/lib/utils";
 import type { Interview } from "@/types/profile";
+import { Separator } from "@radix-ui/react-select";
 import {
+  AlertCircle,
   AudioLines,
   CalendarDays,
   Clock,
@@ -26,12 +29,68 @@ import {
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { z } from "zod";
+
+const formSchema = z.object({
+  type: z.enum(["Voice", "Coding", "Mix"]),
+  area: z.string().optional(),
+  techStack: z.array(z.string()).optional(),
+  level: z.enum(["Easy", "Medium", "Hard"]),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  dateType: z.enum(["Current", "Future"]),
+  scheduledDate: z.date().optional(),
+  duration: z.enum(["Limited", "Permanent"]),
+  durationPeriod: z.number().optional(),
+  invitedCandidates: z.array(z.string()).optional(),
+  category: z.enum(["TECHNICAL", "NON_TECHNICAL", "BEHAVIORAL", "CUSTOM"]),
+  status: z.enum(["DRAFT", "PUBLISHED"]),
+  durationLimit: z.number().min(5, "Duration must be at least 5 minutes"),
+  numberOfQuestions: z.number().min(1, "At least 1 question is required"),
+  questions: z
+    .array(
+      z.object({
+        question: z.string().min(5, "Question must be at least 5 characters"),
+        expectedAnswer: z.string().optional(),
+      })
+    )
+    .optional(),
+});
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface InterviewCardProps {
   interview: Interview;
+  formData: FormValues;
+  techStackPreview: string[];
 }
 
-export default function InterviewCard({ interview }: InterviewCardProps) {
+export default function InterviewCard({ interview, formData, techStackPreview }: InterviewCardProps) {
+
+  const previewInterview: Interview = {
+    id: "preview", // or any temporary ID
+    companyName: formData && "Microsoft" || interview.companyName,
+    companyLogo: formData && "microsoft.com" || interview.companyLogo,
+    name: formData?.area || interview?.name,
+    type: formData?.category || interview?.type,
+    level: formData?.level || interview?.level,
+    score: null,
+    date: formData
+      ? formData.dateType === "Current"
+        ? { type: "permanent", value: "" }
+        : formData.dateType === "Future"
+          ? { type: "future", value: formData.scheduledDate?.toLocaleDateString() || "" }
+          : { type: "limited", value: formData.durationLimit?.toString() || "" }
+      : interview?.date,
+    description: formData?.description || interview?.description,
+    techStack: formData && techStackPreview || interview?.techStack,
+    completed: false,
+    coding: formData?.type === "Coding" || interview?.coding,
+    duration: formData?.duration === "Limited" ? formData?.durationLimit : null,
+    numberOfQuestions: formData?.numberOfQuestions,
+    questions: formData?.questions,
+  };
+
+
   // Track window size using useState and useEffect
   const [windowWidth, setWindowWidth] = useState(0);
   const { user } = useUserStore(state => state)
@@ -39,6 +98,11 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
   const maxBadgesSm = 2; // For small screens (sm)
   const maxBadgesMd = 2; // For medium screens (md)
   const maxBadgesLg = 3; // For large screens (lg)
+
+  console.log("form data: ", formData);
+  console.log("tech stack: ", techStackPreview);
+
+  const currentInterview = formData ? previewInterview : interview;
 
   const {
     id,
@@ -53,7 +117,10 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
     techStack,
     completed,
     coding,
-  } = interview;
+    duration,
+    numberOfQuestions,
+    questions,
+  } = currentInterview;
 
   const getDifficultyColor = (level: string) => {
     switch (level.toLowerCase()) {
@@ -100,13 +167,13 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
   // Determine number of badges to display based on screen size
   const displayedTechs =
     windowWidth <= 640
-      ? techStack.slice(0, maxBadgesSm) // For small screens (mobile)
+      ? techStack?.slice(0, maxBadgesSm) // For small screens (mobile)
       : windowWidth <= 1024
-        ? techStack.slice(0, maxBadgesMd) // For medium screens (tablets/laptops)
-        : techStack.slice(0, maxBadgesLg); // For large screens (desktops)
+        ? techStack?.slice(0, maxBadgesMd) // For medium screens (tablets/laptops)
+        : techStack?.slice(0, maxBadgesLg); // For large screens (desktops)
 
   // Calculate remaining count based on the visible number of badges
-  const remainingCount = techStack.length - displayedTechs.length;
+  const remainingCount = techStack?.length - displayedTechs?.length;
   const theme = useTheme();
 
   const router = useRouter();
@@ -153,26 +220,21 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
         <div className="flex flex-wrap gap-1 mb-4">
           {/* Display tech stack */}
           <div className="flex gap-1">
-            {displayedTechs.map((tech) => (
+            {/* {displayedTechs?.map((tech) => (
               <Badge key={tech} variant="outline" className="font-normal">
                 {tech}
               </Badge>
-            ))}
+            ))} */}
+            {techStack && techStack.length > 0 && (
+              <TechStack techStack={techStack} />
+            )}
           </div>
 
-          {/* Display the remaining count in a circle */}
-          {remainingCount > 0 && (
-            <Avatar className="w-8 h-8 rounded-full flex items-center justify-center">
-              <AvatarFallback className="text-sm">
-                +{remainingCount}
-              </AvatarFallback>
-            </Avatar>
-          )}
         </div>
         <div className="grid grid-cols-2 gap-y-2 text-sm">
           <div className="flex items-center gap-1 text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
-            <span>30-45 min</span>
+            <span>{duration} min</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
             <CalendarDays className="h-3.5 w-3.5" />
@@ -195,6 +257,7 @@ export default function InterviewCard({ interview }: InterviewCardProps) {
             </span>
           </div>
         </div>
+        <Separator />
       </CardContent>
       <CardFooter className="flex flex-col md:flex-row gap-2 pt-0 px-4">
         <div className="w-full">

@@ -116,7 +116,7 @@ export default function ManualInterviewForm() {
   const watchType = form.watch("type");
   const watchDateType = form.watch("dateType");
   const watchDuration = form.watch("duration");
-  //   const watchNumberOfQuestions = form.watch("numberOfQuestions")
+  const watchNumberOfQuestions = form.watch("numberOfQuestions")
   const watchQuestions = form.watch("questions");
   const formValues = form.watch();
 
@@ -454,7 +454,7 @@ export default function ManualInterviewForm() {
                               <FormItem>
                                 <div className="mb-4">
                                   <FormLabel>Tech Stack</FormLabel>
-                                  <FormDescription>
+                                  <FormDescription className="mt-2">
                                     Select the technologies relevant to this
                                     interview.
                                   </FormDescription>
@@ -1020,11 +1020,15 @@ export default function ManualInterviewForm() {
 
                   {/* Questions */}
                   <div className="space-y-6">
+                    <FormDescription>
+                      You can add n number of questions to the interview, our AI will automatically pick the appropriate questions from the list of questions you provide.
+                    </FormDescription>
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-lg font-medium">
                         <HelpCircle className="h-5 w-5 text-primary" />
                         <h3>Questions</h3>
                       </div>
+
                       <TooltipProvider>
                         <Tooltip>
                           <TooltipTrigger asChild>
@@ -1033,7 +1037,7 @@ export default function ManualInterviewForm() {
                               variant="outline"
                               size="sm"
                               onClick={addQuestion}
-                              className="gap-1"
+                              className="gap-1 cursor-pointer"
                             >
                               <Plus className="h-4 w-4" /> Add Question
                             </Button>
@@ -1084,6 +1088,7 @@ export default function ManualInterviewForm() {
                                       </Button>
                                     )}
                                   </div>
+
 
                                   <FormField
                                     control={form.control}
@@ -1209,25 +1214,28 @@ export default function ManualInterviewForm() {
               </div>
               <div className="overflow-auto max-h-[calc(100vh-150px)] pr-2 -mr-2">
                 <InterviewCard
-                  interview={{
-                    id: "1",
-                    companyName: "Apple",
-                    companyLogo: "apple.com",
-                    name: "MERN Stack Developer",
-                    type: "Technical",
-                    coding: true,
-                    level: "Medium",
-                    score: null,
-                    date: {
-                      type: "permanent",
-                      value: "Always available",
-                    },
-                    description:
-                      "This interview assesses your proficiency with the MERN stack (MongoDB, Express.js, React, Node.js) and your ability to build full-stack web applications.",
-                    techStack: ["MongoDB", "Express.js", "React", "Node.js"],
-                    completed: false,
-                  }}
+                  // interview={{
+                  //   id: "1",
+                  //   companyName: "Apple",
+                  //   companyLogo: "apple.com",
+                  //   name: "MERN Stack Developer",
+                  //   type: "Technical",
+                  //   coding: true,
+                  //   level: "Medium",
+                  //   score: null,
+                  //   date: {
+                  //     type: "permanent",
+                  //     value: "Always available",
+                  //   },
+                  //   description:
+                  //     "This interview assesses your proficiency with the MERN stack (MongoDB, Express.js, React, Node.js) and your ability to build full-stack web applications.",
+                  //   techStack: ["MongoDB", "Express.js", "React", "Node.js"],
+                  //   completed: false,
+                  // }}
+                  formData={form.getValues()}
+                  techStackPreview={selectedFrameworks}
                 />
+                {/* Interview Details Preview */}
                 <InterviewPreview formData={form.getValues()} techStack={selectedFrameworks} />
               </div>
             </div>

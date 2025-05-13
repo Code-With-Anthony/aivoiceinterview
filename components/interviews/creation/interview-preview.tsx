@@ -13,9 +13,15 @@ import {
   AlertCircle,
   AudioLines,
   Code2,
+  Video,
+  Mic,
+  Monitor,
+  AlertTriangle,
+  Info,
 } from "lucide-react";
 import ExpandableDescription from "./expandable-interview-content";
 import TechStack from "./text-stack-preview";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface InterviewPreviewProps {
   formData: any;
@@ -102,14 +108,13 @@ export default function InterviewPreview({ formData, techStack }: InterviewPrevi
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-6">
       <Card className="overflow-hidden border-none shadow-md bg-background">
         <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6">
           <div className="flex justify-between items-start">
             <div>
               <h3 className="text-xl font-bold text-primary">
-                {/* {type} Interview */}
-                {area ? `${area}` : 'Interview Title'}
+                Interview Details
               </h3>
               <p className="text-sm text-muted-foreground mt-1">
                 {category} • {numberOfQuestions} questions • {durationLimit}{" "}
@@ -145,6 +150,91 @@ export default function InterviewPreview({ formData, techStack }: InterviewPrevi
             </div>
 
             <Separator />
+
+            <Alert>
+              <Info className="h-4 w-4" />
+              <AlertTitle>Important Guidelines</AlertTitle>
+              <AlertDescription>
+                Please read and follow these guidelines carefully before
+                starting the interview.
+              </AlertDescription>
+            </Alert>
+
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <Video className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Keep Your Camera On</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Your camera must remain on throughout the entire
+                    interview. Make sure you&apos;re in a well-lit environment
+                    with a neutral background.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <Mic className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Keep Your Microphone On</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Your microphone must remain on during the interview. Find
+                    a quiet place to avoid background noise. Voice detection
+                    is active throughout the session.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="bg-primary/10 p-2 rounded-full">
+                  <Monitor className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Screen Monitoring</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Your screen is monitored during the interview. Do not
+                    switch tabs or applications. Avoid copy-pasting content
+                    from external sources.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="bg-destructive/10 p-2 rounded-full">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                </div>
+                <div>
+                  <h3 className="font-medium">Violation Consequences</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Violations of these guidelines may result in immediate
+                    termination of the interview and potential
+                    disqualification. The AI system automatically flags
+                    suspicious behavior.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-muted p-4 rounded-lg">
+              <h3 className="font-medium mb-2">Before You Begin</h3>
+              <ul className="list-disc pl-5 space-y-1 text-sm">
+                <li>Test your camera and microphone</li>
+                <li>Ensure stable internet connection</li>
+                <li>Close unnecessary applications</li>
+                <li>Have a glass of water nearby</li>
+                <li>Find a quiet, distraction-free environment</li>
+                <li>
+                  Allocate sufficient time to complete the interview without
+                  interruptions
+                </li>
+              </ul>
+            </div>
+
+            <Separator className="my-4" />
 
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-center gap-2">
