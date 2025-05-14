@@ -1,5 +1,6 @@
 "use client";
 
+import ExpandableDescription from "@/components/interviews/creation/expandable-interview-content";
 import TechStack from "@/components/interviews/creation/text-stack-preview";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -18,13 +19,13 @@ import { cn } from "@/lib/utils";
 import type { Interview } from "@/types/profile";
 import { Separator } from "@radix-ui/react-select";
 import {
-  AlertCircle,
   AudioLines,
+  CalendarClock,
   CalendarDays,
   Clock,
   Code,
   ExternalLink,
-  Star,
+  Star
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
@@ -33,7 +34,7 @@ import { z } from "zod";
 
 const formSchema = z.object({
   type: z.enum(["Voice", "Coding", "Mix"]),
-  area: z.string().optional(),
+  title: z.string().optional(),
   techStack: z.array(z.string()).optional(),
   level: z.enum(["Easy", "Medium", "Hard"]),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -65,12 +66,25 @@ interface InterviewCardProps {
 }
 
 export default function InterviewCard({ interview, formData, techStackPreview }: InterviewCardProps) {
+  const { user } = useUserStore(state => state);
+  const theme = useTheme();
+  const router = useRouter();
+
+  function getInitials(name: string | undefined): string {
+    // Split the name by spaces
+    const nameParts = name?.split(' ');
+
+    // Get the first letter of each part and convert it to uppercase
+    const initials = nameParts?.map(part => part.charAt(0).toUpperCase()).join('');
+
+    return (initials ?? initials) || "U";
+  }
 
   const previewInterview: Interview = {
     id: "preview", // or any temporary ID
-    companyName: formData && "Microsoft" || interview.companyName,
-    companyLogo: formData && "microsoft.com" || interview.companyLogo,
-    name: formData?.area || interview?.name,
+    companyName: formData && user?.name || interview?.companyName,
+    companyLogo: formData && getInitials(user?.name) || interview?.companyLogo,
+    name: formData?.title || interview?.name,
     type: formData?.category || interview?.type,
     level: formData?.level || interview?.level,
     score: null,
@@ -88,19 +102,16 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
     duration: formData?.duration === "Limited" ? formData?.durationLimit : null,
     numberOfQuestions: formData?.numberOfQuestions,
     questions: formData?.questions,
+    durationLimit: formData?.durationLimit,
   };
 
 
   // Track window size using useState and useEffect
   const [windowWidth, setWindowWidth] = useState(0);
-  const { user } = useUserStore(state => state)
 
   const maxBadgesSm = 2; // For small screens (sm)
   const maxBadgesMd = 2; // For medium screens (md)
   const maxBadgesLg = 3; // For large screens (lg)
-
-  console.log("form data: ", formData);
-  console.log("tech stack: ", techStackPreview);
 
   const currentInterview = formData ? previewInterview : interview;
 
@@ -120,6 +131,7 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
     duration,
     numberOfQuestions,
     questions,
+    durationLimit,
   } = currentInterview;
 
   const getDifficultyColor = (level: string) => {
@@ -172,12 +184,6 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
         ? techStack?.slice(0, maxBadgesMd) // For medium screens (tablets/laptops)
         : techStack?.slice(0, maxBadgesLg); // For large screens (desktops)
 
-  // Calculate remaining count based on the visible number of badges
-  const remainingCount = techStack?.length - displayedTechs?.length;
-  const theme = useTheme();
-
-  const router = useRouter();
-
   const handleStartInterview = () => {
     if (!user) {
       router.push("/sign-in");
@@ -196,10 +202,16 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
         <div className="flex justify-between items-start">
           <div className="flex items-center gap-3">
             <div className="relative h-10 w-10 overflow-hidden rounded-md">
+              <Avatar className={`h-10 w-10 ${!formData ? "hidden" : ""}`}>
+                <AvatarFallback className="bg-muted text-muted-foreground">
+                  {companyLogo}
+                </AvatarFallback>
+              </Avatar>
               <img
                 src={getBrandLogo(companyLogo, theme.theme)}
                 alt={companyName}
                 className="object-cover"
+                hidden={formData}
               />
             </div>
             <div>
@@ -211,9 +223,9 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
             {level}
           </Badge>
         </div>
-        <CardTitle className="text-lg mt-2">{name}</CardTitle>
+        <CardTitle className="text-lg mt-2">{formData ? formData.title ? formData.title : "Interview Title" : name}</CardTitle>
         <CardDescription className="line-clamp-3">
-          {description}
+          <ExpandableDescription description={description ? description : "Enter detailed description about the interview. The description should be crystal clear about the interview and should focus on fully the interview."} maxLength={120} />
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4 flex-grow">
@@ -234,17 +246,31 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
         <div className="grid grid-cols-2 gap-y-2 text-sm">
           <div className="flex items-center gap-1 text-muted-foreground">
             <Clock className="h-3.5 w-3.5" />
-            <span>{duration} min</span>
+            <span>{duration ? duration : durationLimit} min</span>
           </div>
           <div className="flex items-center gap-1 text-muted-foreground">
             <CalendarDays className="h-3.5 w-3.5" />
             <span>{getDateDisplay()}</span>
           </div>
           <div className="flex items-center gap-1">
-            <Star className="h-3.5 w-3.5 text-amber-500" />
-            <span className="font-medium">
-              {score !== null ? `${score}/100` : "Not attempted"}
-            </span>
+            {
+              !formData ? (
+                <>
+                  <Star className="h-3.5 w-3.5 text-amber-500" />
+                  <span className="font-medium">
+                    {score !== null ? `${score}/100` : "Not attempted"}
+                  </span>
+                </>
+              ) : (
+                <>
+                  <CalendarClock className="h-3.5 w-3.5 text-amber-500" />
+                  <span>
+                    {formData?.duration === "Limited" ? `Available for ${formData.durationPeriod ? formData.durationPeriod : "-"} days` : "Available Forever"}
+                  </span>
+                </>
+              )
+            }
+
           </div>
           <div className="flex items-center gap-1">
             {coding === true ? (
@@ -259,24 +285,27 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
         </div>
         <Separator />
       </CardContent>
-      <CardFooter className="flex flex-col md:flex-row gap-2 pt-0 px-4">
-        <div className="w-full">
-          <Button variant="outline" className="w-full cursor-pointer" onClick={handleViewInterviewDetails}>
-            View Details
-            <ExternalLink className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="w-full">
+      {
+        !formData &&
+        <CardFooter className="flex flex-col md:flex-row gap-2 pt-0 px-4">
+          <div className="w-full">
+            <Button variant="outline" className="w-full cursor-pointer" onClick={handleViewInterviewDetails}>
+              View Details
+              <ExternalLink className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="w-full">
 
-          <Button
-            onClick={handleStartInterview}
-            className="w-full cursor-pointer"
-            variant={completed ? "secondary" : "default"}
-          >
-            {completed ? "View Results" : "Take Interview"}
-          </Button>
-        </div>
-      </CardFooter>
+            <Button
+              onClick={handleStartInterview}
+              className="w-full cursor-pointer"
+              variant={completed ? "secondary" : "default"}
+            >
+              {completed ? "View Results" : "Take Interview"}
+            </Button>
+          </div>
+        </CardFooter>
+      }
     </Card>
   );
 }

@@ -1,6 +1,7 @@
 "use server"
 
-import type { UserProfile } from "@/types/profile"
+import { db } from "@/firebase/admin"
+import type { Interview, UserProfile } from "@/types/profile"
 
 // Mock data for demonstration purposes
 // In a real application, this would be fetched from a database
@@ -152,8 +153,8 @@ export async function deleteUserProfile(userId: string): Promise<boolean> {
 }
 
 // Create a new interview
-export async function createInterview(data: any): Promise<{ id: string }> {
-    console.log("Creating interview:", data)
-    // Simulate a database create
-    return { id: "interview-" + Math.random().toString(36).substring(2, 9) }
+export async function createInterview(data: Interview): Promise<{ id: string }> {
+    const docRef = await db.collection("interviews").add(data);
+    console.log("Creating interview:", docRef.id, data)
+    return { id: "interview-" + docRef.id }
 }

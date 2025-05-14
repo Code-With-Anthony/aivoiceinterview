@@ -69,7 +69,7 @@ const InterviewDetails = ({ interview }: { interview: Interview }) => {
                 <div>
                     <h3 className="text-sm font-medium mb-2">Skills Assessed</h3>
                     <div className="flex flex-wrap gap-2">
-                        {interview.techStack.map((tech) => (
+                        {interview?.techStack?.map((tech) => (
                             <Badge key={tech} variant="outline" className="bg-muted/30">
                                 {tech}
                             </Badge>

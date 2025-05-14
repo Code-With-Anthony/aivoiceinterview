@@ -25,6 +25,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 
+import InterviewCard from "@/app/(root)/interview/all/_components/interview-card";
 import { MultiSelect } from "@/components/multi-select";
 import {
   Form,
@@ -56,16 +57,17 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { TECH_STACK } from "@/constants";
 import { createInterview } from "@/lib/actions";
-import { cn } from "@/lib/utils";
+import { cn, } from "@/lib/utils";
 import { programmingLogosList } from "@/public/TechIcons/programmingLogosList";
-import InterviewPreview from "./interview-preview";
-import InterviewCard from "@/app/(root)/interview/all/_components/interview-card";
+import InterviewDetails from "../details/interview-details";
+import { useUserStore } from "@/lib/store/useUserStore";
 
 // Define the form schema with Zod
 const formSchema = z.object({
   type: z.enum(["Voice", "Coding", "Mix"]),
-  area: z.string().optional(),
+  title: z.string().optional(),
   techStack: z.array(z.string()).optional(),
   level: z.enum(["Easy", "Medium", "Hard"]),
   description: z.string().min(10, "Description must be at least 10 characters"),
@@ -75,13 +77,12 @@ const formSchema = z.object({
   durationPeriod: z.number().optional(),
   invitedCandidates: z.array(z.string()).optional(),
   category: z.enum(["TECHNICAL", "NON_TECHNICAL", "BEHAVIORAL", "CUSTOM"]),
-  status: z.enum(["DRAFT", "PUBLISHED"]),
-  durationLimit: z.number().min(5, "Duration must be at least 5 minutes"),
-  numberOfQuestions: z.number().min(1, "At least 1 question is required"),
+  durationLimit: z.number().min(10, "Duration must be at least 5 minutes"),
+  numberOfQuestions: z.number().min(3, "At least 1 question is required"),
   questions: z
     .array(
       z.object({
-        question: z.string().min(5, "Question must be at least 5 characters"),
+        question: z.string().optional(),
         expectedAnswer: z.string().optional(),
       })
     )
@@ -95,6 +96,7 @@ export default function ManualInterviewForm() {
   const [formCompletion, setFormCompletion] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>([]);
+  const { user } = useUserStore(state => state)
 
   // Initialize the form
   const form = useForm<FormValues>({
@@ -105,7 +107,6 @@ export default function ManualInterviewForm() {
       dateType: "Current",
       duration: "Permanent",
       category: "TECHNICAL",
-      status: "DRAFT",
       durationLimit: 30,
       numberOfQuestions: 5,
       questions: [{ question: "", expectedAnswer: "" }],
@@ -129,7 +130,6 @@ export default function ManualInterviewForm() {
       "dateType",
       "duration",
       "category",
-      "status",
       "durationLimit",
       "numberOfQuestions",
     ];
@@ -140,7 +140,7 @@ export default function ManualInterviewForm() {
     });
 
     // Check conditional fields
-    if (watchType === "Voice" && formValues.area) filledFields++;
+    if (watchType === "Voice" && formValues.title) filledFields++;
     if (
       watchType === "Coding" &&
       formValues.techStack &&
@@ -188,8 +188,11 @@ export default function ManualInterviewForm() {
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      // In a real app, you would call an API to create the interview
-      const result = await createInterview(data);
+      const interviewData = {
+        ...data,
+        userId: user?.id
+      }
+      const result = await createInterview(interviewData);
 
       // Navigate to success page with the interview ID
       router.push(`/interview/create/success?id=${result.id}`);
@@ -417,7 +420,7 @@ export default function ManualInterviewForm() {
                         >
                           <FormField
                             control={form.control}
-                            name="area"
+                            name="title"
                             render={({ field }) => (
                               <FormItem className="w-full p-1">
                                 <FormLabel>Interview Title</FormLabel>
@@ -452,12 +455,8 @@ export default function ManualInterviewForm() {
                             name="techStack"
                             render={() => (
                               <FormItem>
-                                <div className="mb-4">
-                                  <FormLabel>Tech Stack</FormLabel>
-                                  <FormDescription className="mt-2">
-                                    Select the technologies relevant to this
-                                    interview.
-                                  </FormDescription>
+                                <div>
+                                  <FormLabel>{TECH_STACK}</FormLabel>
                                 </div>
                                 <div className="w-full">
                                   {/* MultiSelect component to replace the checkbox grid */}
@@ -985,48 +984,16 @@ export default function ManualInterviewForm() {
                           </FormItem>
                         )}
                       />
-
-                      <FormField
-                        control={form.control}
-                        name="status"
-                        render={({ field }) => (
-                          <FormItem className="w-full">
-                            <FormLabel>Status</FormLabel>
-                            <Select
-                              onValueChange={field.onChange}
-                              defaultValue={field.value}
-                            >
-                              <FormControl>
-                                <SelectTrigger className="w-full">
-                                  <SelectValue placeholder="Select status" />
-                                </SelectTrigger>
-                              </FormControl>
-                              <SelectContent>
-                                <SelectItem value="DRAFT">Draft</SelectItem>
-                                <SelectItem value="PUBLISHED">
-                                  Published
-                                </SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <FormDescription>
-                              Draft interviews are not visible to candidates.
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
                     </div>
                   </div>
 
                   {/* Questions */}
                   <div className="space-y-6">
-                    <FormDescription>
-                      You can add n number of questions to the interview, our AI will automatically pick the appropriate questions from the list of questions you provide.
-                    </FormDescription>
+
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2 text-lg font-medium">
                         <HelpCircle className="h-5 w-5 text-primary" />
-                        <h3>Questions</h3>
+                        <h3>Questions (Optional)</h3>
                       </div>
 
                       <TooltipProvider>
@@ -1048,6 +1015,9 @@ export default function ManualInterviewForm() {
                         </Tooltip>
                       </TooltipProvider>
                     </div>
+                    <FormDescription>
+                      You can add any number of questions to the interview. Questions added by you will be asked by the AI. But we recommend you to let the AI ask the questions accordingly.
+                    </FormDescription>
 
                     <div className="space-y-4">
                       <AnimatePresence>
@@ -1235,8 +1205,11 @@ export default function ManualInterviewForm() {
                   formData={form.getValues()}
                   techStackPreview={selectedFrameworks}
                 />
+                <div className="mt-6">
+                  <InterviewDetails interview={formValues?.techStack} />
+                </div>
                 {/* Interview Details Preview */}
-                <InterviewPreview formData={form.getValues()} techStack={selectedFrameworks} />
+                {/* <InterviewPreview formData={form.getValues()} techStack={selectedFrameworks} /> */}
               </div>
             </div>
           </div>

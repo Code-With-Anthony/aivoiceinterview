@@ -10,6 +10,7 @@ import React from 'react'
 
 const HeroSection = ({ interview }: { interview: Interview }) => {
     const Icon = getInterviewTypeIcon(interview?.type);
+
     return (
         <div className={cn("relative w-full bg-gradient-to-r py-12 text-white", getDifficultyGradient(interview?.level))}>
             <div className="absolute inset-0 bg-black/10 backdrop-blur-[1px]"></div>
