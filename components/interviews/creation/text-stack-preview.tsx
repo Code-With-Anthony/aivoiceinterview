@@ -1,3 +1,4 @@
+"use client";
 import { Badge } from "@/components/ui/badge";
 import { programmingLogosList } from "@/public/TechIcons/programmingLogosList";
 import Image from "next/image";

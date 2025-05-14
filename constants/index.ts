@@ -298,3 +298,25 @@ export const PASSWORD_VALIDATIONS = {
     STRONG: "Strong",
   },
 };
+
+export const TABS = {
+  OVERVIEW: "Overview",
+  GUIDELINES: "Guidelines",
+  FAQ: "FAQ",
+  TOP_CANDIDATES: "Top Candidates",
+}
+
+export const SIMILAR_INTERVIEWS = "Similar Interviews";
+export const TOP_SCORING_CANDIDATES = "Top Scoring Candidates";
+
+export const TECH_STACK = "Tech Stack";
+export const ABOUT_THIS_INTERVIEW = "About This Interview";
+export const SAMPLE_QUESTIONS = "Sample Questions";
+export const TESTING_CRITERIA = "What You'll Be Tested On";
+export const FAQ = "Frequently Asked Questions";
+export const IMPORTANT_GUIDELINES = "Important Guidelines";
+export const BEFORE_YOU_BEGIN = "Before You Begin";
+export const TECHNICAL_REQUIREMENTS = "Technical Requirements";
+export const VIOLATION_CONSEQUENCES = "Violation Consequences";
+export const BACK_TO_ALL_INTERVIEWS = "Back to All Interviews";
+export const INTERVIEW_DETAILS = "Interview Details";
