@@ -13,7 +13,7 @@ import TestingCriteria from "@/components/interviews/details/tabs/overview/testi
 import TopCandidates from "@/components/interviews/details/tabs/top_candidates/top-candidates"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { SIMILAR_INTERVIEWS, TABS } from "@/constants"
-import { getInterviewById, getSimilarInterviews } from "@/lib/data"
+import { getSimilarInterviews } from "@/lib/data"
 import {
   BookOpen,
   Calendar,
@@ -26,6 +26,7 @@ import { notFound } from "next/navigation"
 import { Suspense } from "react"
 import InterviewList from "../all/_components/interview-list"
 import InterviewListSkeleton from "../all/_components/interview-list-skelaton"
+import { getInterviewById } from "@/lib/actions/general.action"
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const { id } = await params;
@@ -38,7 +39,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   }
 
   return {
-    title: `${interview.name} | ${interview.companyName}`,
+    title: `${interview.title} | ${interview.companyName}`,
     description: interview.description,
   }
 }
@@ -51,7 +52,10 @@ export default async function InterviewDetailsPage({ params }: { params: { id: s
     notFound()
   }
 
-  const similarInterviews = await getSimilarInterviews(interview.id, interview.techStack)
+  const similarInterviews = await getSimilarInterviews(
+    interview.id as string,
+    interview.techStack as string[]
+  )
 
   return (
     <div className="min-h-screen bg-gradient-to-b">

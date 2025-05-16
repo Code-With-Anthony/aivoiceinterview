@@ -17,8 +17,8 @@ const ExpandableDescription: React.FC<ExpandableDescriptionProps> = ({
   const previewText = description?.length > maxLength ? description.slice(0, maxLength) : description
 
   return (
-    <div>
-      <p className="text-sm">
+    <div className="relative">
+      <p className="text-sm break-words whitespace-pre-wrap">
         {expanded ? description : previewText}{" "}
         {description && description.length > maxLength && (
           <button

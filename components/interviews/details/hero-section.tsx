@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { BACK_TO_ALL_INTERVIEWS } from '@/constants'
+import { getUserByUserId } from '@/lib/actions/general.action'
 import { getBrandLogo } from '@/lib/data'
 import { cn, getDifficultyGradient, getInterviewTypeIcon } from '@/lib/utils'
 import { Interview } from '@/types/profile'
@@ -10,6 +11,11 @@ import React from 'react'
 
 const HeroSection = ({ interview }: { interview: Interview }) => {
     const Icon = getInterviewTypeIcon(interview?.type);
+
+    const getCompanyDetails = async () => {
+        const company = await getUserByUserId(interview?.userId);
+        return company?.name;
+    }
 
     return (
         <div className={cn("relative w-full bg-gradient-to-r py-12 text-white", getDifficultyGradient(interview?.level))}>
@@ -35,11 +41,11 @@ const HeroSection = ({ interview }: { interview: Interview }) => {
                         </div>
                         <div>
                             <div className="flex flex-wrap items-center gap-3 mb-1">
-                                <h1 className="md:text-3xl font-bold sm:text-2xl">{interview?.name}</h1>
+                                <h1 className="md:text-3xl font-bold sm:text-2xl">{interview?.title}</h1>
                                 <Badge className="bg-white/20 text-white hover:bg-white/30 backdrop-blur-md">{interview?.level}</Badge>
                             </div>
                             <div className="flex items-center gap-2 text-white/80">
-                                <span className="font-medium">{interview?.companyName}</span>
+                                <span className="font-medium">{getCompanyDetails()}</span>
                                 <span className="text-white/60">•</span>
                                 <span className="flex items-center gap-1">
                                     <Icon className="h-5 w-5" />

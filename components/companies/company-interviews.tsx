@@ -9,10 +9,8 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, MessageSquare } from "lucide-react";
-// import InterviewCard from "@/components/interviews/interview-card";
+import InterviewCard from "@/components/interviews/interview-card";
 import type { Interview } from "@/types/profile";
-import InterviewCard from "@/app/(root)/interview/all/_components/interview-card";
-
 interface CompanyInterviewsProps {
   interviews: Interview[];
 }

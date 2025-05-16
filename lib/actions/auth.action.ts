@@ -164,7 +164,6 @@ export async function signUp(params: SignUpParams) {
     }
 }
 
-
 // Helper function to check if a user already exists in Firebase Authentication
 export async function checkIfUserExists(email: string) {
     const auth = getAuth();

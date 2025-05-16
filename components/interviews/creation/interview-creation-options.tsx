@@ -6,22 +6,29 @@ import Image from "next/image"
 import { Bot, FileEdit, ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useUserStore } from "@/lib/store/useUserStore"
 
 export default function InterviewCreationOptions() {
     const router = useRouter()
     const [selectedOption, setSelectedOption] = useState<"ai" | "manual" | null>(null)
+    const { user } = useUserStore(state => state)
 
     const handleOptionSelect = (option: "ai" | "manual") => {
         setSelectedOption(option)
     }
 
     const handleContinue = () => {
-        if (selectedOption === "ai") {
-            router.push("/interview/create/ai")
-        } else if (selectedOption === "manual") {
-            router.push("/interview/create/manual")
-        }
-    }
+        if (!user) return;
+
+        const basePath = user.role === "recruiter" ? "/recruiter/interview/create" : "/interview/create";
+
+        const path = selectedOption === "ai"
+            ? `${basePath}/ai`
+            : `${basePath}/manual`;
+
+        router.push(path);
+    };
+
 
     return (
         <div className="max-w-4xl mx-auto">
@@ -136,7 +143,7 @@ export default function InterviewCreationOptions() {
             </div>
 
             <div className="mt-8 flex justify-center">
-                <Button size="lg" onClick={handleContinue} disabled={!selectedOption} className="gap-2">
+                <Button size="lg" onClick={handleContinue} disabled={!selectedOption} className="gap-2 cursor-pointer">
                     Continue <ArrowRight className="h-4 w-4" />
                 </Button>
             </div>

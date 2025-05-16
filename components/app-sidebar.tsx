@@ -46,7 +46,7 @@ const data = {
     },
     {
       title: "All Interviews",
-      url: "/all-interview",
+      url: "/interview/all",
       icon: IconListDetails,
     },
     {

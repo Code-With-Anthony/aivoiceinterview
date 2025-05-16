@@ -1,12 +1,24 @@
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { INTERVIEW_DETAILS } from '@/constants'
+import { ManualInterviewGenerationFormValues } from '@/lib/schemas/manualInterviewGenerationForm'
 import { Interview } from '@/types/profile'
 import { Separator } from '@radix-ui/react-select'
-import { CheckCircle2, FileText, Globe, Layers, Mic, Monitor, Timer, Video } from 'lucide-react'
-import React from 'react'
+import { CheckCircle2, CircleDotDashed, FileText, Globe, Layers, Mic, Monitor, Timer, Video } from 'lucide-react'
 
-const InterviewDetails = ({ interview }: { interview: Interview }) => {
+interface InterviewDetailsProps {
+    interview?: Interview
+    formData?: ManualInterviewGenerationFormValues
+}
+
+const InterviewDetails = ({ interview, formData }: InterviewDetailsProps) => {
+
+    const interviewDetails = formData ? formData : interview
+    const durationLimit = interviewDetails?.durationLimit ?? 30;
+    const numberOfQuestions = interviewDetails?.numberOfQuestions ?? 5;
+    const type = interviewDetails?.type ?? "Voice";
+    const interviewQuestions = interviewDetails?.questions ?? []
+
     return (
         <Card className="sticky top-6 border-t-4 border-t-primary shadow-md">
             <CardHeader className="pb-2">
@@ -19,15 +31,18 @@ const InterviewDetails = ({ interview }: { interview: Interview }) => {
                         <Timer className="h-5 w-5 text-primary" />
                         <div>
                             <h3 className="text-sm font-medium">Duration</h3>
-                            <p className="text-sm">30-45 minutes</p>
+                            <p className="text-sm">{durationLimit}-{durationLimit + 10} minutes</p>
                         </div>
+                        <CardDescription className="text-sm text-muted-foreground">
+                            +10 min buffer time
+                        </CardDescription>
                     </div>
 
                     <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
                         <FileText className="h-5 w-5 text-primary" />
                         <div>
                             <h3 className="text-sm font-medium">Questions</h3>
-                            <p className="text-sm">10-15 questions</p>
+                            <p className="text-sm">{numberOfQuestions}</p>
                         </div>
                     </div>
 
@@ -35,7 +50,7 @@ const InterviewDetails = ({ interview }: { interview: Interview }) => {
                         <Layers className="h-5 w-5 text-primary" />
                         <div>
                             <h3 className="text-sm font-medium">Format</h3>
-                            <p className="text-sm">AI-powered voice</p>
+                            <p className="text-sm">{type}</p>
                         </div>
                     </div>
                 </div>
@@ -55,7 +70,7 @@ const InterviewDetails = ({ interview }: { interview: Interview }) => {
                         </div>
                         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
                             <Globe className="h-4 w-4 text-primary" />
-                            <span className="text-sm">Internet</span>
+                            <span className="text-sm">Stable Internet</span>
                         </div>
                         <div className="flex items-center gap-2 p-2 bg-muted/30 rounded-lg">
                             <Monitor className="h-4 w-4 text-primary" />
@@ -105,6 +120,19 @@ const InterviewDetails = ({ interview }: { interview: Interview }) => {
                             <span className="text-sm">Research the company</span>
                         </li>
                     </ul>
+                </div>
+
+                <div>
+                    <h3 className='text-sm font-medium mb-2'>Sample Questions</h3>
+                    <ul className='space-y-2'>
+                        {interviewQuestions?.map((question, index) => (
+                            <li key={index} className='flex items-start gap-2'>
+                                <CircleDotDashed className='h-4 w-4 text-primary mt-0.5' />
+                                <span className='text-sm'>{question.question}</span>
+                            </li>
+                        ))}
+                    </ul>
+                    <p className='text-sm text-muted-foreground mt-2 mb-2'>These are sample questions and may not be asked in the interview</p>
                 </div>
             </CardContent>
         </Card>

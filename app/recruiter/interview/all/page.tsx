@@ -77,30 +77,83 @@
 // };
 
 // export default Page;
-
-import { Suspense } from "react";
-import type { Metadata } from "next";
+"use client";
+import { Suspense, useEffect, useState } from "react";
 import InterviewFilters from "./_components/interview-filter";
 import InterviewListSkeleton from "./_components/interview-list-skelaton";
 import InterviewList from "./_components/interview-list";
 import InterviewPagination from "./_components/interviewPagination";
 import InterviewFiltersSkeleton from "./_components/interview-filter-skeleton";
-import { getAllInterviews } from "@/lib/actions/general.action";
+import { auth } from "@/firebase/client";
+import { getInterviewsByUserId } from "@/lib/actions/general.action";
+import { Interview } from "@/types/profile";
+import { onAuthStateChanged } from "firebase/auth";
 
-export const metadata: Metadata = {
-  title: "Interviews | AI Voice Interview Platform",
-  description:
-    "Browse and take interviews on our AI-powered voice interview platform",
-};
-
-export default async function InterviewsPage({
+export default function InterviewsPage({
   searchParams,
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  // In a real app, you would pass these search params to your data fetching function
-  const interviews = await getAllInterviews();
-  console.log("Interviews: ", interviews);
+  const [interviews, setInterviews] = useState<Interview[]>([]);
+  const [loading, setLoading] = useState<boolean>(true); // Loading state for fetching interviews
+  console.log("interviews: ", interviews);
+
+  // Function to fetch interviews for the logged-in user
+  // const fetchInterviewsForCurrentUser = async () => {
+  //   try {
+  //     const currentUser = auth.currentUser; // Get current logged-in user
+  //     console.log("Current User: ", currentUser);
+  //     if (currentUser) {
+  //       const interviewsData = await getInterviewsByUserId(currentUser.uid);
+  //       setInterviews(interviewsData ?? []); // Set fetched interviews to state, fallback to empty array if null
+  //       setLoading(false); // Set loading to false when data is fetched
+  //     } else {
+  //       console.log("No user is logged in.");
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching interviews:", error);
+  //     setLoading(false); // Set loading to false if error occurs
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   fetchInterviewsForCurrentUser(); // Fetch interviews when the component mounts
+  // }, []);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        try {
+          const interviewsData = await getInterviewsByUserId(user.uid);
+          setInterviews(interviewsData ?? []);
+        } catch (error) {
+          console.error("Error fetching interviews:", error);
+        }
+      } else {
+        console.log("No user is logged in.");
+        setInterviews([]);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup listener on unmount
+  }, []);
+
+  // While interviews are loading, show skeleton loaders
+  if (loading) {
+    return (
+      <div className="container mx-auto py-8 px-4">
+        <Suspense fallback={<InterviewFiltersSkeleton />}>
+          <InterviewFilters />
+        </Suspense>
+
+        <Suspense fallback={<InterviewListSkeleton />}>
+          <InterviewListSkeleton />
+        </Suspense>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto py-8 px-4">
@@ -117,7 +170,7 @@ export default async function InterviewsPage({
       </Suspense>
 
       <Suspense fallback={<InterviewListSkeleton />}>
-        <InterviewList interviews={interviews ?? []} />
+        <InterviewList interviews={interviews} />
       </Suspense>
 
       <InterviewPagination />

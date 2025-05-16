@@ -81,27 +81,32 @@ export interface SocialMedia {
 }
 
 export interface Interview {
-    id: string
-    companyName: string
-    companyLogo?: string
-    name: string
+    id?: string
+    userId: string // user who created the interview (recruiter/candidate)
+    companyName?: string // name of the company optional for interview card display purpose
+    companyLogo?: string // logo of the company optional for interview card display purpose
+    title: string
     type: string
     coding?: boolean
-    level: string
-    score: number | null
     date: {
-        type: "permanent" | "future" | "limited"
-        value: string
+        interviewTimming: "current" | "future"
+        avialabilityDuration: "limited" | "permanent"
+        scheduledDate: string | null // date when interview will be available
+        durationPeriod?: number //n umber of days interview will be available
     }
+    level: string
     description: string
     techStack: string[]
+    invitedCandidates?: string[]
     completed: boolean
-    duration?: number
+    durationLimit: number // interview duration in minutes
     numberOfQuestions?: number
     questions?: {
         question: string
         expectedAnswer?: string
     }[]
+    createdAt: string | null
+    category: string
 }
 
 export interface TechStack {
