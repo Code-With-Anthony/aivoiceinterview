@@ -34,11 +34,21 @@ export default function InterviewsClientPage() {
 
     useEffect(() => {
         const fetchData = async () => {
-            const data = await getAllInterviews();
-            setInterviews(data || []);
+            try {
+                const data = await getAllInterviews();
+                setInterviews(data || []);
+            } catch (error) {
+                console.error("Failed to fetch interviews:", error);
+                setInterviews([]); // or show a fallback UI
+            }
         };
         fetchData();
     }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [statusFilter, companyFilter, levelFilter, technologyFilter, interviewTypeFilter, categoryFilter, debouncedSearchQuery]);
+
 
     // All filters combined in a memoized function
     const filtered = useMemo(() => {

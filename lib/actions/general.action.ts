@@ -3,6 +3,7 @@
 import { feedbackSchema } from "@/constants";
 import { db } from "@/firebase/admin";
 import { Interview } from "@/types/profile";
+import { sampleInterviews } from "@/utils/utils";
 import { google } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { Timestamp } from "firebase/firestore";
@@ -178,4 +179,15 @@ export async function getUserByUserId(userId: string): Promise<User | null> {
     if (!userId) return null;
     const user = await db.collection("users").doc(userId).get();
     return user.data() as User | null;
+}
+
+export async function addSampleInterviews() {
+    try {
+        for (const interview of sampleInterviews) {
+            await db.collection("interviews").add(interview);
+        }
+        console.log("Sample interviews added successfully!");
+    } catch (error) {
+        console.error("Error adding sample interviews: ", error);
+    }
 }
