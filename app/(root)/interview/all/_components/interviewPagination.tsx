@@ -39,7 +39,7 @@
 
 // export default InterviewPagination;
 
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -60,24 +60,23 @@ const InterviewPagination: React.FC<InterviewPaginationProps> = ({
   totalPages,
   onPageChange,
 }) => {
+
+  const maxVisiblePages = 5
+
+  const pages = useMemo(() => {
+    let start = Math.max(1, currentPage - 2)
+    let end = Math.min(totalPages, start + maxVisiblePages - 1)
+    start = Math.max(1, end - maxVisiblePages + 1)
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i)
+  }, [currentPage, totalPages])
+
+  const handlePageChange = (page: number) => {
+    if (page === currentPage) return
+    onPageChange(page)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
   if (totalPages <= 1) return null; // Don't show pagination if there's only 1 page
-
-  const createPageNumbers = () => {
-    const pages = [];
-    const maxVisiblePages = 5;
-    let start = Math.max(1, currentPage - 2);
-    let end = Math.min(totalPages, start + maxVisiblePages - 1);
-
-    // Adjust start if end is near the total and we don’t have enough pages
-    start = Math.max(1, end - maxVisiblePages + 1);
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-    return pages;
-  };
-
-  const pages = createPageNumbers();
 
   return (
     <Pagination className="mt-4">
@@ -85,9 +84,10 @@ const InterviewPagination: React.FC<InterviewPaginationProps> = ({
         <PaginationItem>
           <PaginationPrevious
             href="#"
+            aria-disabled={currentPage === 1}
             onClick={(e) => {
               e.preventDefault();
-              if (currentPage > 1) onPageChange(currentPage - 1);
+              if (currentPage > 1) handlePageChange(currentPage - 1);
             }}
           />
         </PaginationItem>
@@ -97,9 +97,10 @@ const InterviewPagination: React.FC<InterviewPaginationProps> = ({
             <PaginationLink
               href="#"
               isActive={page === currentPage}
+              aria-current={page === currentPage ? 'page' : undefined}
               onClick={(e) => {
                 e.preventDefault();
-                onPageChange(page);
+                handlePageChange(page);
               }}
             >
               {page}
@@ -110,9 +111,10 @@ const InterviewPagination: React.FC<InterviewPaginationProps> = ({
         <PaginationItem>
           <PaginationNext
             href="#"
+            aria-disabled={currentPage === totalPages}
             onClick={(e) => {
               e.preventDefault();
-              if (currentPage < totalPages) onPageChange(currentPage + 1);
+              if (currentPage < totalPages) handlePageChange(currentPage + 1);
             }}
           />
         </PaginationItem>
@@ -121,4 +123,4 @@ const InterviewPagination: React.FC<InterviewPaginationProps> = ({
   );
 };
 
-export default InterviewPagination;
+export default React.memo(InterviewPagination);
