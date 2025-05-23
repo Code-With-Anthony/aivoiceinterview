@@ -144,7 +144,7 @@ export default function InterviewCard({ interview, formData, techStackPreview }:
     if (!user) {
       router.push("/sign-in");
     } else {
-      router.push(`/interview/${previewInterview.id}`);
+      router.push(`/interview/take/${previewInterview.id}`);
     }
   };
 

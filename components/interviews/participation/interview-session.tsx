@@ -1,69 +1,88 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { motion, AnimatePresence } from "framer-motion"
-import { Mic, MicOff, Camera, CameraOff, Monitor, AlertTriangle, Code, Send, X } from "lucide-react"
+import { Alert } from "@/components/ui/alert"
+import CircularAudioVisualizer from "@/components/ui/audio-visualizer"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { Interview } from "@/types/profile"
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
+import { interviewer } from "@/constants"
+import { createFeedback } from "@/lib/actions/general.action"
+import { getAILogo } from "@/lib/data"
 import { cn } from "@/lib/utils"
+import { vapi } from "@/lib/vapi.sdk"
+import { AnimatePresence, motion } from "framer-motion"
+import {
+    AlertTriangle,
+    Camera,
+    CameraOff,
+    Clock,
+    Maximize2,
+    Mic,
+    MicOff,
+    Minimize2
+} from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useEffect, useRef, useState } from "react"
 
-interface InterviewSessionProps {
-    interview: Interview
+enum CallStatus {
+    INACTIVE = "INACTIVE",
+    ACTIVE = "ACTIVE",
+    CONNECTING = "CONNECTING",
+    FINISHED = "FINISHED",
 }
 
-type Message = {
-    role: "user" | "assistant"
-    content: string
-    timestamp: Date
+interface SavedMessage {
+    role: "user" | "system" | "assistant";
+    content: string;
 }
 
-export default function InterviewSession({ interview }: InterviewSessionProps) {
+export default function InterviewSession({
+    userName,
+    userId,
+    type,
+    interviewId,
+    questions,
+    interviewTitle
+}: AgentProps) {
     const router = useRouter()
-    const [activeTab, setActiveTab] = useState<"interview" | "code">("interview")
-    const [messages, setMessages] = useState<Message[]>([
+    const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
+    const [isSpeaking, setIsSpeaking] = useState(false);
+    const [messages, setMessages] = useState<SavedMessage[]>([
         {
             role: "assistant",
-            content: `Welcome to the ${interview.name} interview. I'll be asking you a series of questions to assess your skills and experience. Please make sure your camera and microphone are enabled. Are you ready to begin?`,
-            timestamp: new Date(),
+            content: `Welcome to the ${interviewTitle} interview. I'll be asking you a series of questions to assess your skills and experience. Please make sure your camera and microphone are enabled. Are you ready to begin?`,
         },
     ])
-    const [input, setInput] = useState("")
-    const [isLoading, setIsLoading] = useState(false)
     const [isMicOn, setIsMicOn] = useState(false)
     const [isCameraOn, setIsCameraOn] = useState(false)
     const [currentQuestion, setCurrentQuestion] = useState(0)
     const [totalQuestions] = useState(10)
     const [showWarning, setShowWarning] = useState(false)
     const [warningCount, setWarningCount] = useState(0)
-    const [code, setCode] = useState("")
     const [isRecording, setIsRecording] = useState(false)
     const [isInterviewComplete, setIsInterviewComplete] = useState(false)
+    const [showDeviceModal, setShowDeviceModal] = useState(true)
+    const [isFullscreen, setIsFullscreen] = useState(false)
+    const [isMuted, setIsMuted] = useState(false)
+    const [elapsedTime, setElapsedTime] = useState(0)
+    const [showEndDialog, setShowEndDialog] = useState(false)
+    const [aiSpeaking, setAiSpeaking] = useState(true)
+    const [showMobileChat, setShowMobileChat] = useState(true)
+    const [showMobileCode, setShowMobileCode] = useState(false)
 
     const messagesEndRef = useRef<HTMLDivElement>(null)
     const videoRef = useRef<HTMLVideoElement>(null)
-
-    // Sample questions for the interview
-    const questions = [
-        "Tell me about your background and experience.",
-        "What are your strengths and weaknesses?",
-        "Describe a challenging project you worked on.",
-        "How do you handle tight deadlines?",
-        "What technologies are you most comfortable with?",
-        "How do you stay updated with industry trends?",
-        "Describe your problem-solving approach.",
-        "How do you work in a team environment?",
-        "What are your career goals?",
-        "Do you have any questions for me?",
-    ]
+    const containerRef = useRef<HTMLDivElement>(null)
+    const timerRef = useRef<NodeJS.Timeout | null>(null)
 
     // Scroll to bottom of messages
     useEffect(() => {
@@ -106,80 +125,65 @@ export default function InterviewSession({ interview }: InterviewSessionProps) {
         }
     }, [isInterviewComplete])
 
-    // Start the interview when user is ready
+    // Timer for interview duration
     useEffect(() => {
-        const handleStartInterview = () => {
-            if (messages.length === 2 && messages[1].role === "user") {
-                setTimeout(() => {
-                    askNextQuestion()
-                }, 1500)
-            }
+        if (!isInterviewComplete) {
+            timerRef.current = setInterval(() => {
+                setElapsedTime((prev) => prev + 1)
+            }, 1000)
+        } else if (timerRef.current) {
+            clearInterval(timerRef.current)
         }
 
-        handleStartInterview()
-    }, [messages])
-
-    const handleSendMessage = async () => {
-        if (!input.trim()) return
-
-        // Add user message
-        const userMessage: Message = {
-            role: "user",
-            content: input,
-            timestamp: new Date(),
-        }
-
-        setMessages((prev) => [...prev, userMessage])
-        setInput("")
-        setIsLoading(true)
-
-        // Simulate AI response
-        setTimeout(() => {
-            if (currentQuestion < totalQuestions - 1) {
-                askNextQuestion()
-            } else {
-                // End the interview
-                const finalMessage: Message = {
-                    role: "assistant",
-                    content:
-                        "Thank you for completing this interview. Your responses have been recorded. You'll receive feedback shortly.",
-                    timestamp: new Date(),
-                }
-
-                setMessages((prev) => [...prev, finalMessage])
-                setIsInterviewComplete(true)
-
-                // Redirect to results page after a delay
-                setTimeout(() => {
-                    router.push(`/interviews/results?id=${interview.id}`)
-                }, 5000)
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current)
             }
-
-            setIsLoading(false)
-        }, 1500)
-    }
-
-    const askNextQuestion = () => {
-        setCurrentQuestion((prev) => {
-            const next = prev + 1
-
-            const questionMessage: Message = {
-                role: "assistant",
-                content: questions[next - 1],
-                timestamp: new Date(),
-            }
-
-            setMessages((prev) => [...prev, questionMessage])
-
-            return next
-        })
-    }
-
-    const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault()
-            handleSendMessage()
         }
+    }, [isInterviewComplete])
+
+    useEffect(() => {
+        const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
+        const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
+
+        const onMessage = (message: Message) => {
+            if (message.type === "transcript" && message.transcriptType === "final") {
+                const newMessage = {
+                    role: message.role,
+                    content: message.transcript,
+                };
+                setMessages((prev) => [...prev, newMessage]);
+            }
+        };
+
+        const onSpeechStart = () => setIsSpeaking(true);
+        const onSpeechEnd = () => setIsSpeaking(false);
+
+        const onError = (error: Error) => console.log("Error", error);
+
+        vapi.on("call-start", onCallStart);
+        vapi.on("call-end", onCallEnd);
+        vapi.on("message", onMessage);
+        vapi.on("speech-start", onSpeechStart);
+        vapi.on("speech-end", onSpeechEnd);
+        vapi.on("error", onError);
+
+        return () => {
+            vapi.off("call-start", onCallStart);
+            vapi.off("call-end", onCallEnd);
+            vapi.off("message", onMessage);
+            vapi.off("speech-start", onSpeechStart);
+            vapi.off("speech-end", onSpeechEnd);
+            vapi.off("error", onError);
+        };
+    }, []);
+
+
+    // Format time for display
+    const formatTime = (seconds: number) => {
+        const mins = Math.floor(seconds / 60)
+        const secs = seconds % 60
+        return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
     }
 
     const toggleMic = () => {
@@ -191,9 +195,18 @@ export default function InterviewSession({ interview }: InterviewSessionProps) {
         setIsCameraOn(!isCameraOn)
     }
 
-    const toggleRecording = () => {
-        setIsRecording(!isRecording)
-        // In a real app, you would implement screen recording here
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            containerRef.current?.requestFullscreen()
+            setIsFullscreen(true)
+        } else {
+            document.exitFullscreen()
+            setIsFullscreen(false)
+        }
+    }
+
+    const toggleMute = () => {
+        setIsMuted(!isMuted)
     }
 
     const handleTabChange = () => {
@@ -218,303 +231,380 @@ export default function InterviewSession({ interview }: InterviewSessionProps) {
 
             // Redirect to results page after a delay
             setTimeout(() => {
-                router.push(`/interviews/results?id=${interview.id}&terminated=true`)
+                router.push(`/interviews/results?id=${interviewId}&terminated=true`)
             }, 5000)
         }
     }
 
     const handleEndInterview = () => {
-        if (confirm("Are you sure you want to end this interview? Your progress will be saved.")) {
-            router.push(`/interviews/results?id=${interview.id}`)
-        }
+        setShowEndDialog(true)
     }
 
-    // Audio visualization for AI speaking
-    const AudioWaveform = () => (
-        <div className="flex items-center gap-0.5 h-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-                <motion.div
-                    key={i}
-                    className="w-1 bg-primary rounded-full"
-                    animate={{
-                        height: [4, 12, 4],
-                    }}
-                    transition={{
-                        duration: 0.8,
-                        repeat: Number.POSITIVE_INFINITY,
-                        repeatType: "reverse",
-                        delay: i * 0.1,
-                    }}
-                />
-            ))}
-        </div>
-    )
+    const confirmEndInterview = () => {
+        handleDisconnect();
+        // router.push(`/interviews/results?id=${interview.id}`)
+    }
+
+    const toggleMobileChat = () => {
+        setShowMobileChat(true)
+        setShowMobileCode(false)
+    }
+
+    const toggleMobileCode = () => {
+        setShowMobileChat(false)
+        setShowMobileCode(true)
+    }
+
+    const handleGenerateFeedback = async (messages: SavedMessage[]) => {
+        const result = await createFeedback({
+            interviewId: interviewId!,
+            userId: userId!,
+            transcript: messages,
+        });
+
+        if (result && result.success && result.feedbackId) {
+            router.push(`/interview/${interviewId}/feedback`);
+        } else {
+            console.error("Error generating feedback");
+            router.push("/");
+        }
+    };
+
+    useEffect(() => {
+        if (callStatus === CallStatus.FINISHED) {
+            if (type === "generate") {
+                router.push("/");
+            } else {
+                handleGenerateFeedback(messages);
+            }
+        }
+    }, [messages, callStatus, type, userId]);
+
+    const handleCall = async () => {
+        setCallStatus(CallStatus.CONNECTING);
+
+        if (type === "generate") {
+            await vapi.start(process.env.NEXT_PUBLIC_VAPI_WORKFLOW_ID!, {
+                variableValues: {
+                    username: userName,
+                    userid: userId,
+                },
+                clientMessages: [],
+                serverMessages: [],
+            });
+        } else {
+            let formattedQuestions = "";
+            if (questions) {
+                formattedQuestions = questions
+                    .map((question) => `- ${question}`)
+                    .join("\n");
+            }
+
+            await vapi.start(interviewer, {
+                variableValues: {
+                    questions: formattedQuestions,
+                },
+                clientMessages: [],
+                serverMessages: [],
+            });
+        }
+    };
+
+    const handleDisconnect = async () => {
+        setCallStatus(CallStatus.FINISHED);
+
+        vapi.stop();
+    };
+
+    const latestMessage = messages[messages.length - 1]?.content;
+    const isCallInactiveOrFinished =
+        callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED;
 
     return (
-        <div className="max-w-6xl mx-auto">
-            <div className="mb-6">
-                <h1 className="text-2xl font-bold">{interview.name}</h1>
-                <div className="flex items-center justify-between mt-2">
-                    <p className="text-muted-foreground">
-                        {interview.type} Interview • {interview.level} • {currentQuestion}/{totalQuestions} Questions
-                    </p>
-                    <Button variant="destructive" size="sm" onClick={handleEndInterview}>
+        <div
+            ref={containerRef}
+            className="max-w-full mx-auto h-[calc(100vh-80px)] flex flex-col bg-gradient-to-b from-background to-background/80"
+        >
+            {/* Header with controls */}
+            <div className="flex items-center justify-between p-4 border-b">
+                <div className="flex items-center gap-3">
+                    <Badge variant={isRecording ? "destructive" : "outline"} className="animate-pulse">
+                        {isRecording ? "Recording" : "Interview"} in Progress
+                    </Badge>
+                    <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                        <Clock className="h-4 w-4" />
+                        <span>{formatTime(elapsedTime)}</span>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <Progress value={(currentQuestion / totalQuestions) * 100} className="w-32 h-2 md:w-48" />
+                    <span className="text-xs text-muted-foreground">
+                        {currentQuestion}/{totalQuestions}
+                    </span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                    <TooltipProvider>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button variant="ghost" size="icon" onClick={toggleFullscreen}>
+                                    {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                                </Button>
+                            </TooltipTrigger>
+                            <TooltipContent>{isFullscreen ? "Exit Fullscreen" : "Enter Fullscreen"}</TooltipContent>
+                        </Tooltip>
+                    </TooltipProvider>
+
+                    <Button variant="destructive" size="sm" onClick={handleEndInterview} className="ml-2">
                         End Interview
                     </Button>
+
+                    <Button variant="default" size="sm" onClick={handleCall} className="ml-2 bg-green-500">Start Interview</Button>
                 </div>
-                <Progress value={(currentQuestion / totalQuestions) * 100} className="mt-4" />
             </div>
 
-            {showWarning && (
-                <Alert variant="destructive" className="mb-4">
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertTitle>Warning!</AlertTitle>
-                    <AlertDescription>
-                        Switching tabs or applications during the interview is not allowed. This is your{" "}
-                        {warningCount === 0 ? "first" : "final"} warning.
-                    </AlertDescription>
-                </Alert>
-            )}
+            {/* Main content area */}
+            <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+                {/* Mobile navigation tabs - only visible on small screens */}
+                <div className="md:hidden flex border-b">
+                    <Button
+                        variant={showMobileChat ? "default" : "ghost"}
+                        onClick={toggleMobileChat}
+                        className="flex-1 rounded-none"
+                    >
+                        Chat
+                    </Button>
+                    {/* {(interview.type === "Coding" || interview.type === "Mix") && (
+                        <Button
+                            variant={showMobileCode ? "default" : "ghost"}
+                            onClick={toggleMobileCode}
+                            className="flex-1 rounded-none"
+                        >
+                            Code Editor
+                        </Button>
+                    )} */}
+                </div>
 
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "interview" | "code")} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="interview">Interview</TabsTrigger>
-                    <TabsTrigger value="code" disabled={interview.type !== "Coding" && interview.type !== "Mix"}>
-                        Code Editor
-                    </TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="interview" className="mt-6">
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                        <div className="lg:col-span-2">
-                            <Card className="h-[600px] flex flex-col">
-                                <CardContent className="flex-1 overflow-y-auto p-4">
-                                    <div className="space-y-4 pt-4">
-                                        <AnimatePresence initial={false}>
-                                            {messages.map((message, index) => (
-                                                <motion.div
-                                                    key={index}
-                                                    initial={{ opacity: 0, y: 10 }}
-                                                    animate={{ opacity: 1, y: 0 }}
-                                                    transition={{ duration: 0.3 }}
-                                                    className={cn("flex items-start gap-3 mb-4", message.role === "user" ? "justify-end" : "")}
-                                                >
-                                                    {message.role === "assistant" && (
-                                                        <Avatar>
-                                                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="AI Interviewer" />
-                                                            <AvatarFallback>AI</AvatarFallback>
-                                                        </Avatar>
-                                                    )}
-
-                                                    <div
-                                                        className={cn(
-                                                            "rounded-lg p-3 max-w-[80%]",
-                                                            message.role === "user" ? "bg-primary text-primary-foreground" : "bg-muted",
-                                                        )}
-                                                    >
-                                                        <p className="text-sm">{message.content}</p>
-                                                        <div className="flex items-center justify-between mt-1">
-                                                            <p className="text-xs opacity-70">
-                                                                {message.timestamp.toLocaleTimeString([], {
-                                                                    hour: "2-digit",
-                                                                    minute: "2-digit",
-                                                                })}
-                                                            </p>
-
-                                                            {message.role === "assistant" && index === messages.length - 1 && <AudioWaveform />}
-                                                        </div>
-                                                    </div>
-
-                                                    {message.role === "user" && (
-                                                        <Avatar>
-                                                            <AvatarImage src="/placeholder.svg?height=40&width=40" alt="You" />
-                                                            <AvatarFallback>You</AvatarFallback>
-                                                        </Avatar>
-                                                    )}
-                                                </motion.div>
-                                            ))}
-                                        </AnimatePresence>
-
-                                        {isLoading && (
-                                            <div className="flex items-start gap-3 mb-4">
-                                                <Avatar>
-                                                    <AvatarImage src="/placeholder.svg?height=40&width=40" alt="AI Interviewer" />
-                                                    <AvatarFallback>AI</AvatarFallback>
-                                                </Avatar>
-                                                <div className="rounded-lg p-3 bg-muted">
-                                                    <div className="flex items-center gap-1">
-                                                        <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse"></div>
-                                                        <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse delay-150"></div>
-                                                        <div className="h-2 w-2 rounded-full bg-muted-foreground animate-pulse delay-300"></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        <div ref={messagesEndRef} />
-                                    </div>
-                                </CardContent>
-
-                                <div className="p-4 border-t">
-                                    <div className="flex items-end gap-2">
-                                        <Textarea
-                                            placeholder="Type your response..."
-                                            value={input}
-                                            onChange={(e) => setInput(e.target.value)}
-                                            onKeyDown={handleKeyDown}
-                                            className="min-h-10 flex-1 resize-none"
-                                            disabled={isInterviewComplete}
-                                        />
-                                        <div className="flex flex-col gap-2">
-                                            <Button
-                                                size="icon"
-                                                variant={isMicOn ? "default" : "outline"}
-                                                onClick={toggleMic}
-                                                className="h-10 w-10"
-                                                disabled={isInterviewComplete}
-                                            >
-                                                {isMicOn ? <MicOff className="h-4 w-4" /> : <Mic className="h-4 w-4" />}
-                                            </Button>
-                                            <Button
-                                                size="icon"
-                                                onClick={handleSendMessage}
-                                                disabled={!input.trim() || isLoading || isInterviewComplete}
-                                                className="h-10 w-10"
-                                            >
-                                                <Send className="h-4 w-4" />
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </Card>
-                        </div>
-
-                        <div>
-                            <Card className="h-[600px] flex flex-col">
-                                <CardContent className="p-4 flex-1 flex flex-col">
-                                    <div className="relative flex-1 rounded-lg overflow-hidden bg-muted mb-4">
-                                        {isCameraOn ? (
-                                            <video ref={videoRef} autoPlay muted className="absolute inset-0 w-full h-full object-cover" />
-                                        ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <p className="text-muted-foreground">Camera is off</p>
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="flex justify-center gap-2 mb-4">
-                                        <Button
-                                            variant={isCameraOn ? "default" : "outline"}
-                                            onClick={toggleCamera}
-                                            className="gap-2 flex-1"
-                                            disabled={isInterviewComplete}
-                                        >
-                                            {isCameraOn ? (
-                                                <>
-                                                    <CameraOff className="h-4 w-4" /> Turn Off Camera
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Camera className="h-4 w-4" /> Turn On Camera
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
-
-                                    <div className="space-y-4">
-                                        <div className="flex items-center justify-between">
-                                            <h3 className="font-medium">Interview Rules</h3>
-                                            <Button
-                                                variant={isRecording ? "default" : "outline"}
-                                                size="sm"
-                                                onClick={toggleRecording}
-                                                className="gap-1"
-                                                disabled={isInterviewComplete}
-                                            >
-                                                <Monitor className="h-4 w-4" />
-                                                {isRecording ? "Recording" : "Record Screen"}
-                                            </Button>
-                                        </div>
-
-                                        <ul className="space-y-2 text-sm">
-                                            <li className="flex items-start gap-2">
-                                                <div className="rounded-full bg-destructive/10 p-1 mt-0.5">
-                                                    <X className="h-3 w-3 text-destructive" />
-                                                </div>
-                                                <span>Do not switch tabs or applications</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="rounded-full bg-destructive/10 p-1 mt-0.5">
-                                                    <X className="h-3 w-3 text-destructive" />
-                                                </div>
-                                                <span>Do not use external resources unless specified</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="rounded-full bg-destructive/10 p-1 mt-0.5">
-                                                    <X className="h-3 w-3 text-destructive" />
-                                                </div>
-                                                <span>Do not communicate with others during the interview</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="rounded-full bg-primary/10 p-1 mt-0.5">
-                                                    <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 8 8">
-                                                        <circle cx="4" cy="4" r="3" />
-                                                    </svg>
-                                                </div>
-                                                <span>Speak clearly and directly into your microphone</span>
-                                            </li>
-                                            <li className="flex items-start gap-2">
-                                                <div className="rounded-full bg-primary/10 p-1 mt-0.5">
-                                                    <svg className="h-3 w-3 text-primary" fill="currentColor" viewBox="0 0 8 8">
-                                                        <circle cx="4" cy="4" r="3" />
-                                                    </svg>
-                                                </div>
-                                                <span>Ensure your face is clearly visible in the camera</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        </div>
-                    </div>
-                </TabsContent>
-
-                <TabsContent value="code" className="mt-6">
-                    <Card className="h-[600px] flex flex-col">
-                        <CardContent className="p-4 flex-1 flex flex-col">
-                            <div className="flex items-center justify-between mb-4">
-                                <h3 className="font-medium">Code Editor</h3>
-                                <div className="flex items-center gap-2">
-                                    <Button variant="outline" size="sm" onClick={() => setCode("")} disabled={!code.trim()}>
-                                        Clear
-                                    </Button>
-                                    <Button variant="outline" size="sm" onClick={() => setActiveTab("interview")}>
-                                        Back to Interview
-                                    </Button>
-                                </div>
-                            </div>
-
-                            <div className="flex-1 bg-muted rounded-md overflow-hidden">
-                                <Textarea
-                                    value={code}
-                                    onChange={(e) => setCode(e.target.value)}
-                                    placeholder="Write your code here..."
-                                    className="h-full resize-none font-mono p-4 bg-muted"
-                                    disabled={isInterviewComplete}
+                {/* Video and chat area */}
+                <div
+                    className={cn(
+                        "flex-1 flex flex-col overflow-hidden w-full",
+                        !showMobileChat && "hidden md:flex",
+                    )}
+                >
+                    {/* Video area */}
+                    <div className="h-[300px] md:h-full p-4 flex items-center justify-center relative bg-muted/30 backdrop-blur-sm">
+                        {/* AI Avatar */}
+                        <div className="relative">
+                            <div
+                                className={cn(
+                                    "w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 relative z-10",
+                                    aiSpeaking ? "border-primary animate-pulse" : "border-muted-foreground/20",
+                                )}
+                            >
+                                <img
+                                    src={getAILogo('apple')}
+                                    alt="AI Assistant"
+                                    className="w-full h-full object-cover"
                                 />
                             </div>
 
-                            <div className="mt-4">
-                                <p className="text-sm text-muted-foreground">
-                                    <Code className="h-4 w-4 inline-block mr-1" />
-                                    Use this editor to write code for any programming questions. Your code will be saved and submitted
-                                    with your interview.
+                            {/* Speaking animation */}
+                            {/* {aiSpeaking && (
+                                <div className="absolute inset-0 z-0">
+                                    <div className="absolute inset-0 rounded-full bg-primary/20 animate-ping"></div>
+                                    <div className="absolute inset-[-8px] rounded-full border border-primary/40"></div>
+                                    <div className="absolute inset-[-16px] rounded-full border border-primary/20"></div>
+                                </div>
+                            )} */}
+
+                            {/* Audio visualizer */}
+                            <div className="absolute inset-0 flex items-center justify-center z-0">
+                                {isSpeaking && <CircularAudioVisualizer isActive={true} className="w-60 h-60" />}
+                            </div>
+
+
+
+                        </div>
+
+                        {/* User video */}
+                        <div className="absolute bottom-4 right-4 w-32 h-24 md:w-48 md:h-36 rounded-lg overflow-hidden border border-muted shadow-lg">
+                            {isCameraOn ? (
+                                <video ref={videoRef} autoPlay muted className="w-full h-full object-cover" />
+                            ) : (
+                                <div className="w-full h-full bg-muted flex items-center justify-center">
+                                    <Camera className="h-8 w-8 text-muted-foreground/50" />
+                                </div>
+                            )}
+
+                            {/* Camera controls */}
+                            <div className="absolute bottom-2 right-2 flex gap-1">
+                                <Button
+                                    size="icon"
+                                    variant="secondary"
+                                    className="h-6 w-6 rounded-full bg-background/80 backdrop-blur-sm"
+                                    onClick={toggleCamera}
+                                >
+                                    {isCameraOn ? <CameraOff className="h-3 w-3" /> : <Camera className="h-3 w-3" />}
+                                </Button>
+
+                                <Button
+                                    size="icon"
+                                    variant="secondary"
+                                    className="h-6 w-6 rounded-full bg-background/80 backdrop-blur-sm"
+                                    onClick={toggleMic}
+                                >
+                                    {isMicOn ? <MicOff className="h-3 w-3" /> : <Mic className="h-3 w-3" />}
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Chat area */}
+
+                </div>
+
+                {/* Code editor area - only shown for coding or mixed interviews */}
+                {/* {(interview.type === "Coding" || interview.type === "Mix") && (
+                    <div className={cn("md:flex-1 flex flex-col border-l overflow-hidden", !showMobileCode && "hidden md:flex")}>
+                        <div className="p-4 border-b bg-muted/30 backdrop-blur-sm flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <Code className="h-4 w-4" />
+                                <h3 className="font-medium">Code Editor</h3>
+                            </div>
+
+                            <div className="flex items-center gap-2">
+                                <Select value={selectedLanguage} onValueChange={setSelectedLanguage}>
+                                    <SelectTrigger className="w-[180px] h-8">
+                                        <SelectValue placeholder="Select Language" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="javascript">JavaScript</SelectItem>
+                                        <SelectItem value="typescript">TypeScript</SelectItem>
+                                        <SelectItem value="python">Python</SelectItem>
+                                        <SelectItem value="java">Java</SelectItem>
+                                        <SelectItem value="csharp">C#</SelectItem>
+                                    </SelectContent>
+                                </Select>
+
+                                <Button variant="ghost" size="icon" onClick={() => setCode("")} disabled={!code.trim()}>
+                                    <RefreshCw className="h-4 w-4" />
+                                </Button>
+                            </div>
+                        </div>
+
+                        <div className="flex-1 overflow-hidden">
+                            <Textarea
+                                value={code}
+                                onChange={(e) => setCode(e.target.value)}
+                                placeholder="// Write your code here..."
+                                className="h-full w-full resize-none font-mono p-4 bg-muted/10 border-0 rounded-none focus-visible:ring-0"
+                                disabled={isInterviewComplete}
+                            />
+                        </div>
+                    </div>
+                )} */}
+
+            </div>
+
+            {messages?.length > 0 && (
+                <div className="transcript-border mt-4 mb-4">
+                    <div className="transcript">
+                        <p
+                            key={latestMessage}
+                            className={cn(
+                                "transition-opacity duration-500 opacity-0",
+                                "animate-fadeIn opacity-100"
+                            )}
+                        >
+                            {latestMessage}
+                        </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Device permission modal */}
+            <Dialog open={showDeviceModal} onOpenChange={setShowDeviceModal}>
+                <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                        <DialogTitle>Enable Camera and Microphone</DialogTitle>
+                        <DialogDescription>
+                            This interview requires access to your camera and microphone. Please enable them to continue.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="grid grid-cols-2 gap-4 py-4">
+                        <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                            <Camera className={cn("h-8 w-8", isCameraOn ? "text-green-500" : "text-destructive")} />
+                            <p className="font-medium">Camera</p>
+                            <Badge variant={isCameraOn ? "outline" : "destructive"}>{isCameraOn ? "Enabled" : "Disabled"}</Badge>
+                            <Button variant={isCameraOn ? "outline" : "default"} size="sm" onClick={toggleCamera}>
+                                {isCameraOn ? "Disable" : "Enable"}
+                            </Button>
+                        </div>
+
+                        <div className="flex flex-col items-center gap-2 p-4 border rounded-lg">
+                            <Mic className={cn("h-8 w-8", isMicOn ? "text-green-500" : "text-destructive")} />
+                            <p className="font-medium">Microphone</p>
+                            <Badge variant={isMicOn ? "outline" : "destructive"}>{isMicOn ? "Enabled" : "Disabled"}</Badge>
+                            <Button variant={isMicOn ? "outline" : "default"} size="sm" onClick={toggleMic}>
+                                {isMicOn ? "Disable" : "Enable"}
+                            </Button>
+                        </div>
+                    </div>
+
+                    <DialogFooter>
+                        <Button onClick={() => setShowDeviceModal(false)} disabled={!isCameraOn || !isMicOn}>
+                            Start Interview
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            {/* Warning alert */}
+            <AnimatePresence>
+                {showWarning && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50"
+                    >
+                        <Alert variant="destructive" className="w-[400px]">
+                            <AlertTriangle className="h-4 w-4" />
+                            <div className="ml-2">
+                                <p className="font-medium">Warning!</p>
+                                <p className="text-sm">
+                                    Switching tabs or applications during the interview is not allowed. This is your{" "}
+                                    {warningCount === 0 ? "first" : "final"} warning.
                                 </p>
                             </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
+                        </Alert>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* End interview confirmation dialog */}
+            <Dialog open={showEndDialog} onOpenChange={setShowEndDialog}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>End Interview</DialogTitle>
+                        <DialogDescription>
+                            Are you sure you want to end this interview? Your progress will be saved.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <DialogFooter>
+                        <Button variant="outline" onClick={() => setShowEndDialog(false)}>
+                            Cancel
+                        </Button>
+                        <Button variant="destructive" onClick={confirmEndInterview}>
+                            End Interview
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

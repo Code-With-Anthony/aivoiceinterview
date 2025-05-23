@@ -115,6 +115,9 @@ export const interviewer: CreateAssistantDTO = {
     style: 0.5,
     useSpeakerBoost: true,
   },
+  backgroundDenoisingEnabled: true,
+  endCallMessage: "Thank you for your time. We will be in touch soon.", // 👈 Assistant says this
+  endCallPhrases: ["Thank you for your time. We will be in touch soon."], // 👈 Once said, the call ends
   model: {
     provider: "openai",
     model: "gpt-4",
@@ -320,3 +323,12 @@ export const TECHNICAL_REQUIREMENTS = "Technical Requirements";
 export const VIOLATION_CONSEQUENCES = "Violation Consequences";
 export const BACK_TO_ALL_INTERVIEWS = "Back to All Interviews";
 export const INTERVIEW_DETAILS = "Interview Details";
+export const placeholders = [
+  "Google Frontend Developer",
+  "Microsoft Full Stack Engineer",
+  "Apple Backend Engineer",
+  "Javascript Coding Interview",
+  "Zomato Business Analyst Interview",
+  "KPMG Project Manager Interview",
+  "RBI Grade B Interview",
+];

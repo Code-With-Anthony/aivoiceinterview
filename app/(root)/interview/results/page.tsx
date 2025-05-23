@@ -52,7 +52,7 @@ export default function InterviewResultsPage() {
         return (
             <div className="container mx-auto py-16 px-4 flex flex-col items-center justify-center min-h-[80vh]">
                 <h1 className="text-2xl font-bold mb-4">Interview Not Found</h1>
-                <p className="text-muted-foreground mb-8">We couldn't find the interview results you're looking for.</p>
+                <p className="text-muted-foreground mb-8">We couldn&apos;t find the interview results you&apos;re looking for.</p>
                 <Link href="/interviews">
                     <Button>Back to Interviews</Button>
                 </Link>
@@ -85,7 +85,7 @@ export default function InterviewResultsPage() {
                     <p className="text-muted-foreground mt-1">
                         {wasTerminated
                             ? "Your interview was terminated due to rule violations."
-                            : `Here's how you performed in the ${interview.name} interview.`}
+                            : `Here's how you performed in the ${interview.title} interview.`}
                     </p>
                 </div>
 
@@ -223,7 +223,7 @@ export default function InterviewResultsPage() {
                                             <ul className="list-disc pl-5 space-y-1">
                                                 <li>Could provide more specific technical details</li>
                                                 <li>Consider structuring responses with the STAR method</li>
-                                                <li>Expand on how you've handled challenges</li>
+                                                <li>Expand on how you&apos;ve handled challenges</li>
                                                 <li>Provide more quantifiable results when discussing achievements</li>
                                             </ul>
                                         </div>
@@ -353,20 +353,20 @@ export default function InterviewResultsPage() {
                                             <div className="bg-muted p-3 rounded-md mt-2">
                                                 <p className="text-sm font-medium">Example STAR Response:</p>
                                                 <p className="text-sm mt-1">
-                                                    <strong>Situation:</strong> "At my previous company, we faced a critical performance issue
-                                                    with our main application."
+                                                    <strong>Situation:</strong> At my previous company, we faced a critical performance issue
+                                                    with our main application.
                                                 </p>
                                                 <p className="text-sm mt-1">
-                                                    <strong>Task:</strong> "I was tasked with identifying the bottleneck and improving response
-                                                    times by at least 50%."
+                                                    <strong>Task:</strong> I was tasked with identifying the bottleneck and improving response
+                                                    times by at least 50%.
                                                 </p>
                                                 <p className="text-sm mt-1">
-                                                    <strong>Action:</strong> "I profiled the application, identified inefficient database queries,
-                                                    implemented caching, and optimized the most resource-intensive operations."
+                                                    <strong>Action:</strong> I profiled the application, identified inefficient database queries,
+                                                    implemented caching, and optimized the most resource-intensive operations.
                                                 </p>
                                                 <p className="text-sm mt-1">
-                                                    <strong>Result:</strong> "These changes reduced response times by 70% and improved user
-                                                    satisfaction scores by 25%."
+                                                    <strong>Result:</strong> These changes reduced response times by 70% and improved user
+                                                    satisfaction scores by 25%.
                                                 </p>
                                             </div>
                                         </div>

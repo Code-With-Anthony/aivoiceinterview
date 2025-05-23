@@ -6,6 +6,13 @@ export function getBrandLogo(domain: string, theme?: string) {
     return `https://cdn.brandfetch.io/${domain}/${theme}/w/200/h/200?c=${clientId}`;
 }
 
+export function getAILogo(domain: string, theme?: string) {
+    if (!theme) theme = "light";
+    const clientId = process.env.NEXT_PUBLIC_BRANDFETCH_CLIENT_ID!;
+    return `https://cdn.brandfetch.io/${domain}.com/${theme}/w/200/h/200?c=${clientId}`;
+}
+
+
 
 // Mock data for demonstration purposes
 const interviews: Interview[] = [

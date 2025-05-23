@@ -53,6 +53,7 @@ interface AgentProps {
   userName: string;
   userId?: string;
   interviewId?: string;
+  interviewTitle?: string
   feedbackId?: string;
   type: "generate" | "interview";
   questions?: string[];
@@ -113,4 +114,25 @@ interface MenuItem {
   description?: string;
   icon?: React.ReactNode;
   items?: MenuItem[];
+}
+
+interface CompanyAndTechnologiesFilterProps {
+  selected: string[];
+  onChange: (values: string[]) => void;
+}
+
+// Match your parent interface
+interface InterviewFiltersInterface {
+  status: string[];
+  technologies: string[];
+  level: string[];
+  company: string[];
+  type: string[];
+  category: string[];
+}
+
+interface InterviewGeneralFilterProps {
+  filters?: InterviewFiltersInterface;
+  addFilter: (category: keyof InterviewFiltersInterface, value: string) => void;
+  activeStatus?: string | null;
 }

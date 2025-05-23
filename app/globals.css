@@ -317,6 +317,10 @@
       @apply text-sm font-semibold capitalize text-white dark:text-black;
     }
   }
+
+  .wiz-container {
+    @apply w-64 h-64 rounded-full relative overflow-hidden;
+  }
 }
 
 @utility dark-gradient {
